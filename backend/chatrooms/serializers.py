@@ -8,4 +8,4 @@ class ChatRoomSerializer(serializers.ModelSerializer):
                                                       
     class Meta:
         model=ChatRoom
-        fields=['id','name','participant_id']
+        fields=['id','name','room_type','participant_id','created_at']

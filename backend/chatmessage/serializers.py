@@ -4,6 +4,7 @@ from users.models import User
 from chatmessage.models import Message
 
 class MessageSerializer(serializers.ModelSerializer):
+    
                                                       
     class Meta:
         model=Message
