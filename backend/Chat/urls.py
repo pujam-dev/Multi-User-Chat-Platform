@@ -12,5 +12,5 @@ urlpatterns = [
           jwt_views.TokenRefreshView.as_view(), 
           name ='token_refresh'),
     path('chatrooms/',include('chatrooms.urls')),
-    path('message/',include('chatmessage.urls')),
+    path('messages/',include('chatmessage.urls')),
 ]

@@ -8,16 +8,11 @@ from chatmessage.serializers import MessageSerializer
 from chatmessage.models import Message
 
 
-
-
-class RoomMessagesView(generics.ListCreateAPIView):
-    renderer_classes=[UserRenderer]
+class MessageListCreateView(generics.ListCreateAPIView):
+    queryset = Message.objects.all().order_by("-time_stamp")
     serializer_class = MessageSerializer
-    def get_queryset(self):
-        chatroom_id = self.kwargs["chatroom_id"]
-        return Message.objects.filter(chatroom_id=chatroom_id).order_by("timestamp")
-    def perform_create(self, serializer):
-        serializer.save(
-            sender=self.request.user,
-            chatroom_id=self.kwargs["chatroom_id"]
-        )
+#  Get, Update, Delete single message
+class MessageDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    lookup_field = "id"
