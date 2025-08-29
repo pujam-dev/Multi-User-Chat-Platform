@@ -10,3 +10,4 @@ root.render(
   </React.StrictMode>
 );
 
+// index file for project
