@@ -1,0 +1,38 @@
+<!-- static/index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>FastAPI Chat</title>
+  <style>
+    body { font-family: Arial; display:flex; justify-content:center; padding-top:30px; }
+    #container { width:520px; border:1px solid #ddd; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
+    #header { padding:10px; background:#f6f6f6; border-bottom:1px solid #eee; }
+    #messages { height:360px; overflow:auto; padding:12px; background:white; }
+    .msg { margin:6px 0; padding:8px 10px; border-radius:8px; max-width:80%; }
+    .me { background:#dcf8c6; margin-left:auto; text-align:right; }
+    .other { background:#f1f0f0; text-align:left; }
+    .system { color:#666; font-size:13px; text-align:center; }
+    #inputArea { display:flex; border-top:1px solid #eee; }
+    #text { flex:1; padding:10px; border:none; outline:none; }
+    button { width:110px; border:none; background:#4CAF50; color:white; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="header">
+      <strong>FastAPI Chat (port 9000)</strong>
+      <div style="float:right; font-size:13px;" id="onlineCount">Online: 0</div>
+    </div>
+
+    <div id="messages"></div>
+
+    <div id="inputArea">
+      <input id="text" placeholder="Type message..." autocomplete="off" />
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
