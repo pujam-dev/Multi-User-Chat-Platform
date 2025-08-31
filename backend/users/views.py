@@ -1,9 +1,11 @@
 from django.shortcuts import render
+from users.models import User
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from django.contrib.auth import authenticate
-from users.serializers import UserRegistrationSerializer,UserLoginSerializer,UserProfileSerializer
+from users.serializers import UserRegistrationSerializer,UserLoginSerializer,UserProfileSerializer, UserSerializer
 from users.renderers import UserRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
@@ -72,3 +74,10 @@ class LogoutView(APIView):
                return Response({"msg":"logged out successfully"},status=status.HTTP_205_RESET_CONTENT)
           except Exception as e:
                return Response({"error":str(e)},status=status.HTTP_400_BAD_REQUEST)
+          
+
+
+class UserListView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]   # agar tumhe sirf logged in user ko dikhana hai

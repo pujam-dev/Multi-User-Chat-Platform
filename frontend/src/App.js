@@ -5,6 +5,7 @@ import Profile from "./components/Profile";
 // import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Register from "./components/Register";
+import Home from "./components/home";
 function App() {
   const appRouter = createBrowserRouter([
     {
@@ -23,6 +24,11 @@ function App() {
       path: "/logout",
       element: <Logout />,
     },
+      {
+      path: "/home",
+      element: <Home />,
+    },
+    
   ]);
 
   return (

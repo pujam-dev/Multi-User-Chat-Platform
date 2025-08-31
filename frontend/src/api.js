@@ -15,3 +15,20 @@ export const register = async(userData)=>{
  }
  return json
 }
+
+export const getUsers = async () => {
+  const token = localStorage.getItem("access"); // login ke time save kiya tha
+  const res = await fetch(`${API_URL}/users/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,  // 👈 yaha token bhejna zaroori hai
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch users");
+  }
+
+  return await res.json();
+};

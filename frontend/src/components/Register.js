@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { register } from "../api";
+import { useNavigate } from "react-router-dom";   // ✅ import navigate
+
 const Register = () => {
   const [form, setForm] = useState({
     email: "",
@@ -9,10 +11,12 @@ const Register = () => {
     password2: "",
     tc: true,
   });
-  const [message, setMessage] = useState(""); // feedback message
+  const [message, setMessage] = useState(""); 
+  const navigate = useNavigate();   // ✅ initialize navigate
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simple validations
+
     if (!form.email || !form.name || !form.password || !form.password2) {
       setMessage(":warning: Please fill all required fields.");
       return;
@@ -21,9 +25,16 @@ const Register = () => {
       setMessage(":x: Passwords do not match.");
       return;
     }
+
     try {
       const res = await register(form);
       setMessage(res.msg || ":white_check_mark: Registration successful!");
+
+      // ✅ redirect to Home after 1 sec
+      setTimeout(() => {
+        navigate("/home");
+      }, 1000);
+
     } catch (err) {
       setMessage(":x: Registration failed. Please try again.");
     }
