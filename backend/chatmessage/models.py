@@ -11,4 +11,4 @@ class Message(models.Model):
     time_stamp=models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return self.id
+        return f"{self.sender_id.name}:{self.content[:20]}"
