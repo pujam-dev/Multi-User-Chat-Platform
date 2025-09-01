@@ -10,13 +10,7 @@ import uvicorn
 
 app = FastAPI()
 
-# mount static folder so /static/script.js is served
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# serve index.html at root
-@app.get("/")
-async def get_index():
-    return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
 # Connection manager to handle multiple clients

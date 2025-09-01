@@ -16,6 +16,23 @@ export const register = async(userData)=>{
  return json
 }
 
+export const login = async(userData)=>{
+ const data = await fetch(`${API_URL}/login/`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(userData)
+ })
+ const json = await data.json()
+
+ if (data.ok) {
+    localStorage.setItem("access",json.token.access);
+    localStorage.setItem("refresh",json.token.refresh);
+     localStorage.setItem("userid",json.data.userid);
+    localStorage.setItem("username",json.data.username);
+ }
+ return json
+}
+
 export const getUsers = async () => {
   const token = localStorage.getItem("access"); // login ke time save kiya tha
   const res = await fetch(`${API_URL}/users/`, {

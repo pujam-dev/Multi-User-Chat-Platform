@@ -8,7 +8,8 @@ export default function Home() {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-
+  const username = localStorage.getItem("username")
+  const userid = localStorage.getItem("userid")
   useEffect(() => {
     (async () => {
       try {
@@ -48,15 +49,44 @@ export default function Home() {
     return parts.map(p => p[0]?.toUpperCase() || "").join("");
   };
 
-  const goToChat = (u) => {
+  const goToChat = async (u) => {
     // Navigate to your dedicated chat page
     // You can choose either a route param or query params; both examples below.
 
     // Option A: /chat/:id
-    navigate(`/chat/${u.id}`, { state: { name: displayName(u) } });
-
+    // navigate(`/chat/${u.id}`, { state: { name: displayName(u) } });
     // Option B (alternative): /chat?to=<id>&name=<name>
     // navigate(`/chat?to=${u.id}&name=${encodeURIComponent(displayName(u))}`);
+
+
+  try {
+
+    const res = await fetch("http://127.0.0.1:8000/chatrooms/private/create/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("access")}`
+      },
+      body: JSON.stringify({
+        user1: userid,  
+        user2: u.id        
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      console.log("Private room:", data);
+      sessionStorage.setItem("chatRoom", JSON.stringify(data));
+     
+      window.location.href = `/chat.html`; 
+    } else {
+      alert(data.error || "Something went wrong");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+  }
+
+
+   // window.location.href = `/chat.html?username=${displayName(u)}`
   };
 
   return (

@@ -2,12 +2,16 @@
 (function () {
   // prompt for username
   let username = "";
-  while (!username) {
-    username = prompt("Enter username (will be visible to others):");
-    if (username) username = username.trim();
-  }
+  // while (!username) {
+  //   username = prompt("Enter username (will be visible to others):");
+  //   if (username) username = username.trim();
+  // }
+  // const params = new URLSearchParams(window.location.search)
+  // username=params.get("username")
 
-  const wsUrl = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws";
+console.log(sessionStorage.getItem('chatRoom'))
+
+  const wsUrl = "ws://127.0.0.1:9000/ws";
   const socket = new WebSocket(wsUrl);
 
   const messagesEl = document.getElementById("messages");

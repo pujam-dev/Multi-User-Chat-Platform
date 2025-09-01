@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { register } from "../api";
-import { useNavigate } from "react-router-dom";   // ✅ import navigate
+import { Link, useNavigate } from "react-router-dom";   // ✅ import navigate
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -107,6 +107,7 @@ const Register = () => {
         <button type="submit" className="btn btn-primary w-100 mb-4">
           Submit
         </button>
+        <p>Already have an account !! <Link to="/login">Login</Link> </p>
       </form>
     </div>
   );

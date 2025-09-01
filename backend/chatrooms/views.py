@@ -29,7 +29,7 @@ class PrivateChatView(APIView):
             room = ChatRoom.objects.create(room_type="private")
             room.participant_id.set([user1, user2])
         serializer = ChatRoomSerializer(room)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"data":serializer.data,"sender":user1.id,"receiver":user2.id}, status=status.HTTP_200_OK)
 
 class PublicChatList(generics.ListAPIView):
     queryset = ChatRoom.objects.filter(room_type="public")
