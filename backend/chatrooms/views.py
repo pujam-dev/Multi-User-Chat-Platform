@@ -26,7 +26,7 @@ class PrivateChatView(APIView):
             room_type="private", participant_id=user1
         ).filter(participant_id=user2).first()
         if not room:
-            room = ChatRoom.objects.create(room_type="private")
+            room = ChatRoom.objects.create(room_type="private",name=user1.name+"&"+user2.name)
             room.participant_id.set([user1, user2])
         serializer = ChatRoomSerializer(room)
         return Response({"data":serializer.data,"sender":user1.id,"receiver":user2.id}, status=status.HTTP_200_OK)
