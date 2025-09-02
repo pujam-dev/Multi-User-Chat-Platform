@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 from typing import List, Dict
-
+import requests
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -10,7 +10,7 @@ import uvicorn
 
 app = FastAPI()
 
-
+DJANGO_API_URL="http://127.0.0.1:8000/messages/"
 
 
 # Connection manager to handle multiple clients
@@ -65,15 +65,38 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
         while True:
-            text = await websocket.receive_text()  # chat message from this client
+            data = await websocket.receive_text()  # chat message from this client
             # build payload
-            payload = {
+            payload = json.loads(data)
+           # build payload
+         
+            sender = payload["sender_id"]
+            receiver = payload["receiver_id"]
+            chatroom = payload["chatroom_id"]
+            content = payload["content"]
+            
+            print(f"🟢  {sender} → {receiver}: {content}")
+            #  Step 3: Django API me message save karo
+           # headers = {'Content-type': 'application/json',"Authorization": Bearer ${localStorage.getItem("access")}}
+            response = requests.post(DJANGO_API_URL, json={
+                "sender_id": sender,
+                "receiver_id": receiver,
+                "chatroom_id": chatroom,
+                "content": content
+            })
+            if response.status_code == 201:
+                print("🟢  Message saved in Django")
+            else:
+                print(":x: Django save error:", response.text)
+
+
+            # broadcast to all connected clients (including sender)
+            await manager.broadcast ({
                 "type": "chat",
                 "username": username,
-                "message": text
-            }
-            # broadcast to all connected clients (including sender)
-            await manager.broadcast(payload)
+                "message": content
+            })
+
 
     except WebSocketDisconnect:
         left_user = manager.remove(websocket)

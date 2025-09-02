@@ -10,6 +10,10 @@
   // username=params.get("username")
 
 console.log(sessionStorage.getItem('chatRoom'))
+//response {"data":{"id":2,"name":"","room_type":"private","participant_id":[1,3],"created_at":"2025-09-01T13:10:02.014297Z"},"sender":3,"receiver":1}
+chatRoomDetails=JSON.parse(sessionStorage.getItem('chatRoom'))
+const {data,sender,receiver}=chatRoomDetails
+//console.log(data.id,sender,receiver)
 
   const wsUrl = "ws://127.0.0.1:9000/ws";
   const socket = new WebSocket(wsUrl);
@@ -30,7 +34,7 @@ console.log(sessionStorage.getItem('chatRoom'))
 
   socket.addEventListener("open", function () {
     // send username as first message to register
-    socket.send(username);
+    socket.send(localStorage.getItem('username'));
   });
 
   socket.addEventListener("message", function (event) {
@@ -64,7 +68,13 @@ console.log(sessionStorage.getItem('chatRoom'))
   sendBtn.addEventListener("click", function () {
     const val = textInput.value.trim();
     if (!val) return;
-    socket.send(val);
+    payload={
+      'receiver_id':receiver,
+      'sender_id':sender,
+      'chatroom_id':data.id,
+      'content':val
+    }
+    socket.send(JSON.stringify(payload));
     textInput.value = "";
   });
 
