@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { getUsers } from "../api";
 
 export default function Home() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const username = localStorage.getItem("username")
+  //const username = localStorage.getItem("username")
   const userid = localStorage.getItem("userid")
   useEffect(() => {
     (async () => {
@@ -59,35 +59,46 @@ export default function Home() {
     // navigate(`/chat?to=${u.id}&name=${encodeURIComponent(displayName(u))}`);
 
 
-  try {
+    try {
 
-    const res = await fetch("http://127.0.0.1:8000/chatrooms/private/create/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("access")}`
-      },
-      body: JSON.stringify({
-        user1: userid,  
-        user2: u.id        
-      }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      console.log("Private room:", data);
-      sessionStorage.setItem("chatRoom", JSON.stringify(data));
-     
-      window.location.href = `/chat.html`; 
-    } else {
-      alert(data.error || "Something went wrong");
+      const res = await fetch("http://127.0.0.1:8000/chatrooms/private/create/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("access")}`
+        },
+        body: JSON.stringify({
+          user1: userid,
+          user2: u.id
+        }),
+      });
+      console.log(userid, u.id)
+      const data = await res.json();
+      if (res.ok) {
+        console.log("Private room:", data);
+        sessionStorage.setItem("chatRoom", JSON.stringify(data));
+
+        window.location.href = `/chat.html`;
+      } else {
+        alert(data.error || "Something went wrong");
+      }
+    } catch (err) {
+      console.error("Error:", err);
     }
-  } catch (err) {
-    console.error("Error:", err);
-  }
 
 
-   // window.location.href = `/chat.html?username=${displayName(u)}`
+    // window.location.href = `/chat.html?username=${displayName(u)}`
   };
+
+  async function loadMyChatRooms(){
+  const res=await fetch("http://127.0.0.1:8000/chatrooms/my-rooms/", {
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("access")}`
+    }
+  })
+  const rooms = await res.json()
+  console.log("chatrooms :",rooms)
+}
 
   return (
     <div className="container py-4">
@@ -156,6 +167,18 @@ export default function Home() {
             ))}
         </div>
       </div>
+<div>
+      <h3
+        className="border m-3"
+      >
+        Private Chats
+      </h3>
+      </div>
+ <h3
+        className="border m-3"
+      >
+        Groups
+      </h3>
     </div>
   );
 }

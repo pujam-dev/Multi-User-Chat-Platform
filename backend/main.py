@@ -1,104 +1,122 @@
 # main.py
 import json
-from pathlib import Path
-from typing import List, Dict
 import requests
+from typing import Dict, List
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 import uvicorn
-
 app = FastAPI()
-
-DJANGO_API_URL="http://127.0.0.1:8000/messages/"
-
-
-# Connection manager to handle multiple clients
+DJANGO_API_URL = "http://127.0.0.1:8000/messages/"
+# Room wise connection manager
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
-        self.usernames: Dict[WebSocket, str] = {}  # map websocket -> username
+        # room_id -> list of connections
+        self.rooms: Dict[str, List[WebSocket]] = {}
+        # connection -> username
+        self.usernames: Dict[WebSocket, str] = {}
+        # connection -> room_id
+        self.user_rooms: Dict[WebSocket, str] = {}
 
-    # add connection AFTER websocket.accept() has been called
-    async def add(self, websocket: WebSocket, username: str):
-        self.active_connections.append(websocket)
+    async def add(self, websocket: WebSocket, username: str, room_id: str):
+        # user join karega room_id me
+        if room_id not in self.rooms:
+            self.rooms[room_id] = []
+        self.rooms[room_id].append(websocket)
         self.usernames[websocket] = username
-        # notify everyone that user joined
-        await self.broadcast_system(f"🟢 {username} joined the chat")
+        self.user_rooms[websocket] = room_id
+        await self.broadcast_system(room_id, f"🟢 {username} joined room {room_id}")
 
     def remove(self, websocket: WebSocket) -> str:
-        # remove connection and return username (if any)
         username = self.usernames.pop(websocket, None)
-        if websocket in self.active_connections:
-            self.active_connections.remove(websocket)
-        return username
-
-    async def broadcast(self, payload: dict):
+        room_id = self.user_rooms.pop(websocket, None)
+        if room_id and websocket in self.rooms.get(room_id, []):
+            self.rooms[room_id].remove(websocket)
+            # agar room empty ho jaye toh delete kar do
+            if not self.rooms[room_id]:
+                del self.rooms[room_id]
+        return username, room_id
+    
+    async def broadcast(self, room_id: str, payload: dict):
+        """send message to all users of a room"""
         text = json.dumps(payload)
-        for conn in list(self.active_connections):
+        for conn in list(self.rooms.get(room_id, [])):
             try:
                 await conn.send_text(text)
             except Exception:
-                # if sending fails, remove connection
                 self.remove(conn)
 
-    async def broadcast_system(self, message: str):
-        await self.broadcast({"type": "system", "message": message})
-
+    async def broadcast_system(self, room_id: str, message: str):
+        await self.broadcast(room_id, {"type": "system", "message": message})
 
 manager = ConnectionManager()
 
-
 @app.websocket("/ws")
+
 async def websocket_endpoint(websocket: WebSocket):
-    # Accept connection first
     await websocket.accept()
-
-    # Expect the client to send username as first message
     try:
-        username = await websocket.receive_text()
-    except WebSocketDisconnect:
-        return
-
-    # register connection
-    await manager.add(websocket, username)
-
-    try:
+        # client se first message ayega -> join payload
+        # example: {"type": "join", "username": "Alice", "chatroom_id": "123"}
+        join_data = await websocket.receive_text()
+        join_payload = json.loads(join_data)
+        if join_payload.get("type") != "join":
+            await websocket.close()
+            return
+        username = join_payload["username"]
+        room_id = join_payload["chatroom_id"]
+        # register user
+        await manager.add(websocket, username, room_id)
+        # ab infinite loop messages ke liye
         while True:
-            data = await websocket.receive_text()  # chat message from this client
-            # build payload
+            data = await websocket.receive_text()
             payload = json.loads(data)
-           # build payload
-         
-            sender = payload["sender_id"]
-            receiver = payload["receiver_id"]
-            chatroom = payload["chatroom_id"]
-            content = payload["content"]
-            
-            print(f"🟢  {sender} → {receiver}: {content}")
-            #  Step 3: Django API me message save karo
-           # headers = {'Content-type': 'application/json',"Authorization": Bearer ${localStorage.getItem("access")}}
-            response = requests.post(DJANGO_API_URL, json={
-                "sender_id": sender,
-                "receiver_id": receiver,
-                "chatroom_id": chatroom,
-                "content": content
-            })
-            if response.status_code == 201:
-                print("🟢  Message saved in Django")
-            else:
-                print(":x: Django save error:", response.text)
-
-
-            # broadcast to all connected clients (including sender)
-            await manager.broadcast ({
-                "type": "chat",
-                "username": username,
-                "message": content
-            })
-
+            if payload.get("type") == "chat":
+                sender = payload["sender_id"]
+                receiver = payload["receiver_id"]
+                chatroom = payload["chatroom_id"]
+                content = payload["content"]
+                print(f"🟢 Room {chatroom} | {sender} → {receiver}: {content}")
+                # Django API me save karo
+                response = requests.post(DJANGO_API_URL, json={
+                    "sender_id": sender,
+                    "receiver_id": receiver,
+                    "chatroom_id": chatroom,
+                    "content": content
+                })
+                if response.status_code == 201:
+                    print("🟢 Message saved in Django")
+                else:
+                    print(":x: Django save error:", response.text)
+                # broadcast message to same room
+                await manager.broadcast(chatroom, {
+                    "type": "chat",
+                    "username": username,
+                    "message": content,
+                    "sender_id": sender,
+                    "receiver_id": receiver
+                })
 
     except WebSocketDisconnect:
-        left_user = manager.remove(websocket)
-        if left_user:
-            await manager.broadcast_system(f"🔴 {left_user} left the chat")
+        left_user, room_id = manager.remove(websocket)
+        if left_user and room_id:
+            await manager.broadcast_system(room_id, f"🔴  {left_user} left room {room_id}")
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=3000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

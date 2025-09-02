@@ -36,6 +36,13 @@ class PublicChatList(generics.ListAPIView):
     serializer_class = ChatRoomSerializer
 
 
+class UserChatRoomView(generics.ListCreateAPIView):
+    renderer_classes=[UserRenderer]
+    permission_classes=[IsAuthenticated]
+    serializer_class = ChatRoomSerializer
+    def get_queryset(self):
+        user=self.request.user
+        return ChatRoom.objects.filter(participant_id=user).order_by("created_at")
 
 
 

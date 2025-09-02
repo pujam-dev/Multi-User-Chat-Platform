@@ -32,9 +32,32 @@ const {data,sender,receiver}=chatRoomDetails
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  async function loadOldMessages(chatroomId) {
+  const response = await fetch(`http://127.0.0.1:8000/messages/?chatroom_id=${chatroomId}`, {
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("access")}`
+    }
+  });
+  const messages = await response.json();
+  console.log("Previous messages:", messages);
+  messages.forEach(msg => {
+    const kind = msg.sender_id === sender ? "me" : "other";
+    appendMessage(`<strong>${msg.sender_name}:</strong> ${msg.content}`, kind);
+  });
+}
+
+
+
   socket.addEventListener("open", function () {
     // send username as first message to register
-    socket.send(localStorage.getItem('username'));
+   // socket.send(localStorage.getItem('username'));
+        payload={
+      'type':'join',
+      'username':localStorage.getItem('username'),
+      'chatroom_id':data.id
+    }
+    socket.send(JSON.stringify(payload));
+    loadOldMessages(data.id)
   });
 
   socket.addEventListener("message", function (event) {
@@ -69,6 +92,7 @@ const {data,sender,receiver}=chatRoomDetails
     const val = textInput.value.trim();
     if (!val) return;
     payload={
+      'type':'chat',
       'receiver_id':receiver,
       'sender_id':sender,
       'chatroom_id':data.id,

@@ -20,6 +20,7 @@ const Login = () => {
 
     try {
       const res = await login(form);
+      console.log(res)
       setMessage(res.msg || " login successful!");
 
       // ✅ redirect to Home after 1 sec
