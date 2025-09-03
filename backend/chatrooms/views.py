@@ -39,6 +39,11 @@ class PublicChatList(generics.ListCreateAPIView):
     serializer_class = ChatRoomSerializer
     permission_classes=[IsAuthenticated]
 
+class PublicChatUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
+    renderer_classes = [UserRenderer]
+    queryset = ChatRoom.objects.filter(room_type="public")
+    serializer_class = ChatRoomSerializer
+
 #chatrooms where the user is involved like private chatrooms
 class UserChatRoomView(APIView):
     renderer_classes=[UserRenderer]

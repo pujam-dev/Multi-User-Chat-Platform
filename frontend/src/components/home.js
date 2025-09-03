@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 //import { useNavigate } from "react-router-dom";
 
 import MyModal from "../MyModal";
+import Groups from "./Groups";
 
 export default function Home() {
   //const navigate = useNavigate();
@@ -29,6 +30,8 @@ export default function Home() {
       }
     })();
   }, []);
+
+
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -161,6 +164,7 @@ export default function Home() {
 
 
       <h3>Public Groups</h3>
+      <Groups/>
       <MyModal msg="Create Group" />
     </div>
   );

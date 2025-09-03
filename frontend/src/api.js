@@ -59,9 +59,10 @@ export const createGroup= async (userData)=>{
     },body:JSON.stringify(userData)
   });
   const data = await res.json()
-  console.log(data)
+//  console.log(data)
     if (!res.ok) {
     throw new Error("Failed to create group");
   }
  return data;
 }
+
