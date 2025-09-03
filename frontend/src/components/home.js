@@ -21,7 +21,7 @@ export default function Home() {
       })
       const data=await res.json()
       console.log(data.data)
-        setUsers(Array.isArray(data.data) ? data : []);
+        setUsers(Array.isArray(data.data) ? data.data : []);
       } catch (e) {
         setErr("Unable to load users");
       } finally {
@@ -43,6 +43,7 @@ export default function Home() {
       return name.toLowerCase().includes(term) || email.toLowerCase().includes(term);
     });
   }, [q, users]);
+  console.log("filtered"+filtered)
 
   const displayName = (u) =>
     u.name ||
@@ -128,7 +129,7 @@ export default function Home() {
               {!loading && !err && filtered.length === 0 && (
                 <div className="list-group-item text-secondary">No users found</div>
               )}
-
+             
               {!loading &&
                 !err &&
                 filtered.map((u) => (
