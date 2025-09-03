@@ -1,5 +1,5 @@
 const API_URL="http://127.0.0.1:8000/auth/user";
-
+ const token = localStorage.getItem("access");
 
 export const register = async(userData)=>{
  const data = await fetch(`${API_URL}/register/`,{
@@ -8,7 +8,7 @@ export const register = async(userData)=>{
     body:JSON.stringify(userData)
  })
  const json = await data.json()
-console.log(json)
+//console.log(json)
  if (data.ok) {
     localStorage.setItem("access",json.token.access);
     localStorage.setItem("refresh",json.token.refresh);
@@ -34,7 +34,7 @@ export const login = async(userData)=>{
 }
 
 export const getUsers = async () => {
-  const token = localStorage.getItem("access"); // login ke time save kiya tha
+
   const res = await fetch(`${API_URL}/users/`, {
     method: "GET",
     headers: {
@@ -49,3 +49,19 @@ export const getUsers = async () => {
 
   return await res.json();
 };
+
+export const createGroup= async (userData)=>{
+     const res = await fetch(`http://127.0.0.1:8000/chatrooms/public/create/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,  // 👈 yaha token bhejna zaroori hai
+    },body:JSON.stringify(userData)
+  });
+  const data = await res.json()
+  console.log(data)
+    if (!res.ok) {
+    throw new Error("Failed to create group");
+  }
+ return data;
+}

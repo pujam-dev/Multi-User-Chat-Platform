@@ -4,8 +4,9 @@ import { Button, Modal } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import UserList from './components/UserList';
+import CreateGroup from './components/CreateGroup';
 
-function MyModal() {
+function MyModal({ msg }) {
     // 1. Manage the modal's visibility with state
     const [show, setShow] = useState(false);
 
@@ -17,7 +18,7 @@ function MyModal() {
         <>
             {/* 3. The button uses an onClick handler to open the modal */}
             <Button variant="primary" className='m-2 rounded-pill' onClick={handleShow}>
-                +
+                {msg}
             </Button>
 
             {/* 4. The Modal component's visibility is controlled by the `show` state */}
@@ -26,7 +27,7 @@ function MyModal() {
                     <Modal.Title>Users</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <UserList />
+                    { (msg === "+") ? <UserList /> : <CreateGroup/> }
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>

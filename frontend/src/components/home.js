@@ -88,21 +88,7 @@ export default function Home() {
 
     // window.location.href = `/chat.html?username=${displayName(u)}`
   };
-  // useEffect(() => {
-  //   async function loadMyChats() {
-  //     const res = await fetch("http://127.0.0.1:8000/chatrooms/mychats", {
-  //       headers: {
-  //         "Authorization": `Bearer ${localStorage.getItem("access")}`
-  //       }
-  //     })
-  //     const rooms = await res.json()
-  //     setUsers(Array.isArray(rooms) ? rooms : []);
-
-  //   }
-  // }, [])
-
-
-
+  
   return (
     <div className="container py-4">
        <div className="card shadow-sm">
@@ -171,7 +157,11 @@ export default function Home() {
             </div>
           </div>
 
-      <MyModal />
+      <MyModal msg="+" />
+
+
+      <h3>Public Groups</h3>
+      <MyModal msg="Create Group" />
     </div>
   );
 }

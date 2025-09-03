@@ -9,8 +9,8 @@ class ChatRoom(models.Model):
         ('public','Public'),
     )
     name=models.CharField(max_length=255)
-    room_type=models.CharField(max_length=10,choices=ROOM_TYPE_CHOICES,default='public')
-    participant_id=models.ManyToManyField(settings.AUTH_USER_MODEL,related_name="chat_rooms")
+    room_type=models.CharField(max_length=10,choices=ROOM_TYPE_CHOICES)
+    participant_id=models.ManyToManyField(settings.AUTH_USER_MODEL,related_name="chat_rooms",blank=True)
     created_at=models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

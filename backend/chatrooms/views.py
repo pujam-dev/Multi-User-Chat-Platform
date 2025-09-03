@@ -14,6 +14,7 @@ from users.serializers import UserSerializer
 
 class PrivateChatView(APIView):
     renderer_classes=[UserRenderer]
+    permission_classes=[IsAuthenticated]
     def post(self, request):
         user1_id = request.data.get("user1")
         user2_id = request.data.get("user2")
@@ -32,11 +33,13 @@ class PrivateChatView(APIView):
         serializer = ChatRoomSerializer(room)
         return Response({"data":serializer.data,"sender":user1.id,"receiver":user2.id}, status=status.HTTP_200_OK)
 
-class PublicChatList(generics.ListAPIView):
+class PublicChatList(generics.ListCreateAPIView):
+    renderer_classes=[UserRenderer]
     queryset = ChatRoom.objects.filter(room_type="public")
     serializer_class = ChatRoomSerializer
+    permission_classes=[IsAuthenticated]
 
-
+#chatrooms where the user is involved like private chatrooms
 class UserChatRoomView(APIView):
     renderer_classes=[UserRenderer]
     permission_classes=[IsAuthenticated]
