@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 //import { useNavigate } from "react-router-dom";
 import { getUsers } from "../api";
-import MyModal from "../MyModal";
+
 
 export default function UserList() {
   //const navigate = useNavigate();

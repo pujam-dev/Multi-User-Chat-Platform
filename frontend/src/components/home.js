@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 //import { useNavigate } from "react-router-dom";
-import { getUsers } from "../api";
+
 import MyModal from "../MyModal";
 
 export default function Home() {
@@ -14,8 +14,14 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await getUsers(); // must return array of users
-        setUsers(Array.isArray(data) ? data : []);
+        const res = await fetch("http://127.0.0.1:8000/chatrooms/mychats", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("access")}`
+        }
+      })
+      const data=await res.json()
+      console.log(data.data)
+        setUsers(Array.isArray(data.data) ? data : []);
       } catch (e) {
         setErr("Unable to load users");
       } finally {
@@ -81,37 +87,90 @@ export default function Home() {
 
     // window.location.href = `/chat.html?username=${displayName(u)}`
   };
+  // useEffect(() => {
+  //   async function loadMyChats() {
+  //     const res = await fetch("http://127.0.0.1:8000/chatrooms/mychats", {
+  //       headers: {
+  //         "Authorization": `Bearer ${localStorage.getItem("access")}`
+  //       }
+  //     })
+  //     const rooms = await res.json()
+  //     setUsers(Array.isArray(rooms) ? rooms : []);
 
-    async function loadMyChats() {
-    const res = await fetch("http://127.0.0.1:8000/chatrooms/mychats", {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("access")}`
-      }
-    })
-    const rooms = await res.json()
-    console.log("chats", rooms)
-  }
+  //   }
+  // }, [])
+
 
 
   return (
     <div className="container py-4">
-      <div className="card shadow-sm">
-        <div className="card-header d-flex align-items-center justify-content-between">
-          <h5 className="mb-0">Chats</h5>
-          {/* search  */}
-          <div className="d-flex" style={{ gap: 8 }}>
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              className="form-control"
-              placeholder="Search users..."
-              style={{ width: 240 }}
-            />
+       <div className="card shadow-sm">
+            <div className="card-header d-flex align-items-center justify-content-between">
+
+              <div className="d-flex" style={{ gap: 8 }}>
+                <input
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  className="form-control"
+                  placeholder="Search users..."
+                  style={{ width: 240 }}
+                />
+              </div>
+            </div>
+
+            <div className="list-group list-group-flush">
+              {loading && (
+                <div className="list-group-item text-secondary">Loading…</div>
+              )}
+              {err && !loading && (
+                <div className="list-group-item text-danger">{err}</div>
+              )}
+              {!loading && !err && filtered.length === 0 && (
+                <div className="list-group-item text-secondary">No users found</div>
+              )}
+
+              {!loading &&
+                !err &&
+                filtered.map((u) => (
+                  <div
+                    key={u.id}
+                    className="list-group-item d-flex align-items-center justify-content-between"
+                  >
+                    <div className="d-flex align-items-center" style={{ gap: 12 }}>
+                      {/* Simple circle avatar with initials (no extra lib) */}
+                      <div
+                        style={{
+                          width: 38,
+                          height: 38,
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "#e9ecef",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {initials(u)}
+                      </div>
+                      <div>
+                        <div className="fw-semibold">{displayName(u)}</div>
+                        <div className="text-muted small">{u.email || "-"}</div>
+                      </div>
+                    </div>
+
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => goToChat(u)}
+                      title={`Chat with ${displayName(u)}`}
+                    >
+                      Chat
+                    </button>
+                  </div>
+                ))}
+            </div>
           </div>
-        </div>
-      </div>
-      {loadMyChats()}
-      <MyModal/>
+
+      <MyModal />
     </div>
   );
 }
