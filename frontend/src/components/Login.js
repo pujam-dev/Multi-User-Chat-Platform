@@ -21,16 +21,17 @@ const Login = () => {
 
     try {
       const res = await login(form);
-      console.log(res)
+     // console.log(res.errors.non_field_errors[0])
      
-      if (res) {
+      if (res && !res.errors) {
          setMessage(" login successful!");
         // ✅ redirect to Home after 1 sec
         setTimeout(() => {
           navigate("/home");
         }, 500);
       } else {
-        alert(res.error || "Something went wrong");
+        //alert(res.error || "Something went wrong");
+        setMessage(res.errors.non_field_errors[0])
       }
     } catch (err) {
       console.error("Error:", err);

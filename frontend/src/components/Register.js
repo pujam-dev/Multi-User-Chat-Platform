@@ -28,15 +28,16 @@ const Register = () => {
 
     try {
       const res = await register(form);
-   
-      if (res.ok) {
+     
+      if (res && !res.errors) {
            setMessage(" Registration successful!");
         // ✅ redirect to Home after 1 sec
         setTimeout(() => {
           navigate("/home");
         }, 500);
       } else {
-        alert(res.error || "Something went wrong");
+       
+        setMessage(res.errors.email)
       }
 
     } catch (err) {

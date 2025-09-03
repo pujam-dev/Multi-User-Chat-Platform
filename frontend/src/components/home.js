@@ -43,7 +43,7 @@ export default function Home() {
       return name.toLowerCase().includes(term) || email.toLowerCase().includes(term);
     });
   }, [q, users]);
-  console.log("filtered"+filtered)
+
 
   const displayName = (u) =>
     u.name ||

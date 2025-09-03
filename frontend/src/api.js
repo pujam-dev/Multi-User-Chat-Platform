@@ -8,7 +8,7 @@ export const register = async(userData)=>{
     body:JSON.stringify(userData)
  })
  const json = await data.json()
-
+console.log(json)
  if (data.ok) {
     localStorage.setItem("access",json.token.access);
     localStorage.setItem("refresh",json.token.refresh);
