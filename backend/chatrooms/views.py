@@ -7,6 +7,7 @@ from chatrooms.models import ChatRoom
 from users.models import User
 from users.renderers import UserRenderer
 from chatrooms.serializers import ChatRoomSerializer
+from users.serializers import UserSerializer
 
 
 
@@ -36,13 +37,20 @@ class PublicChatList(generics.ListAPIView):
     serializer_class = ChatRoomSerializer
 
 
-class UserChatRoomView(generics.ListCreateAPIView):
+class UserChatRoomView(APIView):
     renderer_classes=[UserRenderer]
     permission_classes=[IsAuthenticated]
-    serializer_class = ChatRoomSerializer
-    def get_queryset(self):
-        user=self.request.user
-        return ChatRoom.objects.filter(participant_id=user).order_by("created_at")
+    
+    def get(self,request):
+        user = request.user
+        rooms = ChatRoom.objects.filter(participant_id=user)
+        other_users=set()
+        for room in rooms:
+            for u in room.participant_id.exclude(id=user.id):
+                other_users.add(u)
+        serializer=UserSerializer(list(other_users),many=True)
+        return Response({"data":serializer.data},status=status.HTTP_200_OK)
+
 
 
 

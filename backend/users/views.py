@@ -45,9 +45,7 @@ class UserLoginView(APIView):
                 return Response({"token":token,"msg":"Login successful","data":{
                     "username":user.name,
                     "userid":user.id
-
-                }},
-                            status=status.HTTP_200_OK)
+                }},status=status.HTTP_200_OK)
             else:
                 return Response({'errors':{'non_field_errors':['email or password is not valid ']}},
                             status=status.HTTP_404_NOT_FOUND)       

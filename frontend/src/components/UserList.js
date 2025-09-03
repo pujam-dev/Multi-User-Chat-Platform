@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getUsers } from "../api";
 import MyModal from "../MyModal";
 
-export default function Home() {
+export default function UserList() {
   //const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
@@ -51,6 +51,15 @@ export default function Home() {
   };
 
   const goToChat = async (u) => {
+    // Navigate to your dedicated chat page
+    // You can choose either a route param or query params; both examples below.
+
+    // Option A: /chat/:id
+    // navigate(`/chat/${u.id}`, { state: { name: displayName(u) } });
+    // Option B (alternative): /chat?to=<id>&name=<name>
+    // navigate(`/chat?to=${u.id}&name=${encodeURIComponent(displayName(u))}`);
+
+
     try {
 
       const res = await fetch("http://127.0.0.1:8000/chatrooms/private/create/", {
@@ -82,23 +91,13 @@ export default function Home() {
     // window.location.href = `/chat.html?username=${displayName(u)}`
   };
 
-    async function loadMyChats() {
-    const res = await fetch("http://127.0.0.1:8000/chatrooms/mychats", {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem("access")}`
-      }
-    })
-    const rooms = await res.json()
-    console.log("chats", rooms)
-  }
 
 
   return (
     <div className="container py-4">
       <div className="card shadow-sm">
         <div className="card-header d-flex align-items-center justify-content-between">
-          <h5 className="mb-0">Chats</h5>
-          {/* search  */}
+        
           <div className="d-flex" style={{ gap: 8 }}>
             <input
               value={q}
@@ -109,9 +108,61 @@ export default function Home() {
             />
           </div>
         </div>
+
+        <div className="list-group list-group-flush">
+          {loading && (
+            <div className="list-group-item text-secondary">Loading…</div>
+          )}
+          {err && !loading && (
+            <div className="list-group-item text-danger">{err}</div>
+          )}
+          {!loading && !err && filtered.length === 0 && (
+            <div className="list-group-item text-secondary">No users found</div>
+          )}
+
+          {!loading &&
+            !err &&
+            filtered.map((u) => (
+              <div
+                key={u.id}
+                className="list-group-item d-flex align-items-center justify-content-between"
+              >
+                <div className="d-flex align-items-center" style={{ gap: 12 }}>
+                  {/* Simple circle avatar with initials (no extra lib) */}
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "#e9ecef",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {initials(u)}
+                  </div>
+                  <div>
+                    <div className="fw-semibold">{displayName(u)}</div>
+                    <div className="text-muted small">{u.email || "-"}</div>
+                  </div>
+                </div>
+
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => goToChat(u)}
+                  title={`Chat with ${displayName(u)}`}
+                >
+                  Chat
+                </button>
+              </div>
+            ))}
+        </div>
       </div>
-      {loadMyChats()}
-      <MyModal/>
+
+
+
     </div>
   );
 }

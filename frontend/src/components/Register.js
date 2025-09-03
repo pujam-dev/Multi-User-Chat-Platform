@@ -11,7 +11,7 @@ const Register = () => {
     password2: "",
     tc: true,
   });
-  const [message, setMessage] = useState(""); 
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();   // ✅ initialize navigate
 
   const handleSubmit = async (e) => {
@@ -28,12 +28,16 @@ const Register = () => {
 
     try {
       const res = await register(form);
-      setMessage(res.msg || ":white_check_mark: Registration successful!");
-
-      // ✅ redirect to Home after 1 sec
-      setTimeout(() => {
-        navigate("/home");
-      }, 1000);
+   
+      if (res.ok) {
+           setMessage(" Registration successful!");
+        // ✅ redirect to Home after 1 sec
+        setTimeout(() => {
+          navigate("/home");
+        }, 500);
+      } else {
+        alert(res.error || "Something went wrong");
+      }
 
     } catch (err) {
       setMessage(":x: Registration failed. Please try again.");

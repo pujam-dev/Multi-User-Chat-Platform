@@ -5,5 +5,5 @@ urlpatterns = [
     path('public/create/',views.PublicChatList.as_view(),name='publicroomcreate'),
     path('private/create/',views.PrivateChatView.as_view(),name='privateroomcreate'),
 
-    path("my-rooms/", views.UserChatRoomView.as_view(), name="my-chatrooms"),
+    path("mychats/", views.UserChatRoomView.as_view(), name="mychats"),
 ]
