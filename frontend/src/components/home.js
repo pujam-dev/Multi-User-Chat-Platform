@@ -74,7 +74,7 @@ export default function Home() {
           user2: u.id
         }),
       });
-      console.log(userid, u.id)
+      //console.log(userid, u.id)
       const data = await res.json();
       if (res.ok) {
         console.log("Private room:", data);
@@ -87,9 +87,6 @@ export default function Home() {
     } catch (err) {
       console.error("Error:", err);
     }
-
-
-    // window.location.href = `/chat.html?username=${displayName(u)}`
   };
   
   return (

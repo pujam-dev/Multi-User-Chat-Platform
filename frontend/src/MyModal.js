@@ -27,7 +27,7 @@ function MyModal({ msg }) {
                     <Modal.Title>Users</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    { (msg === "+") ? <UserList /> : <CreateGroup/> }
+                    { (msg === "+") ? <UserList /> : <CreateGroup onClose={()=>setShow(false)}/> }
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>

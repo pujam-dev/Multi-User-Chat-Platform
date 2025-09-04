@@ -100,8 +100,6 @@ async def websocket_endpoint(websocket: WebSocket):
         if left_user and room_id:
             await manager.broadcast_system(room_id, f"🔴  {left_user} left room {room_id}")
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=3000)
 
 
 

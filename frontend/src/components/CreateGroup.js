@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import { createGroup } from '../api';
 import { Link, useNavigate } from "react-router-dom";
 
-const CreateGroup = () => {
+const CreateGroup = ({onClose}) => {
 
     const [message, setMessage] = useState("");
     const [name, setName] = useState('')
@@ -21,7 +21,8 @@ const CreateGroup = () => {
             if (res && !res.errors) {
                 setMessage(" Group Created");
                 setTimeout(() => {
-                    navigate("/home");
+                   if (onClose) onClose();
+                   navigate(0)
                 }, 500);
             } else {
                 //alert(res.error || "Something went wrong");

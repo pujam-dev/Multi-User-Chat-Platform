@@ -34,15 +34,19 @@ class PrivateChatView(APIView):
         return Response({"data":serializer.data,"sender":user1.id,"receiver":user2.id}, status=status.HTTP_200_OK)
 
 class PublicChatList(generics.ListCreateAPIView):
-    renderer_classes=[UserRenderer]
+    renderer_classes = [UserRenderer]
     queryset = ChatRoom.objects.filter(room_type="public")
     serializer_class = ChatRoomSerializer
-    permission_classes=[IsAuthenticated]
-
+    permission_classes = [IsAuthenticated]
+    def get_serializer_context(self):
+        return {"request": self.request}
 class PublicChatUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     renderer_classes = [UserRenderer]
     queryset = ChatRoom.objects.filter(room_type="public")
     serializer_class = ChatRoomSerializer
+    permission_classes = [IsAuthenticated]
+    def get_serializer_context(self):
+        return {"request": self.request}
 
 #chatrooms where the user is involved like private chatrooms
 class UserChatRoomView(APIView):
