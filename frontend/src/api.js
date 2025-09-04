@@ -6,46 +6,48 @@ const API_URL="http://127.0.0.1:8000/auth/user";
 
 
 export async function fetchWithAuth(url, options = {}) {
-    let access = localStorage.getItem("access");
-    let refresh = localStorage.getItem("refresh");
-    if (!options.headers) {
-        options.headers = {};
-    }
-    options.headers["Authorization"] = `Bearer ${access}`;
-    options.headers["Content-Type"] = "application/json";
-    let response = await fetch(url, options);
-    // अगर access token expire हो गया
-    const refreshPayload={
-      refresh:localStorage.getItem("refresh"),
-    }
-    if (response.status === 401 && refresh) {
-        console.warn(":warning: Access token expired, trying refresh...");
-        let refreshRes = await fetch("http://127.0.0.1:8000/token/refresh/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(refreshPayload)
-        });
-        console.log(refreshRes)
+  let access = localStorage.getItem("access");
+  let refresh = localStorage.getItem("refresh");
+  console.log("options",options)
+  if (!options.headers) options.headers = {};
+  options.headers["Authorization"] = `Bearer ${access}`;
+  options.headers["Content-Type"] = "application/json";
 
-        if (refreshRes.ok) {
-           // console.log("if is working")
-            let data = await refreshRes.json();
-            localStorage.setItem("access", data.access);
-            // दोबारा request try करो
-            options.headers["Authorization"] = `Bearer ${data.access}`;
-            response = await fetch(url, options);
-        } else {
-            console.error("Refresh token invalid, please login again.");
-            // logout logic
-            // <Logout/>
-        }
+  let response = await fetch(url, options);
+
+  // Agar access token expire ho gaya
+  if (response.status === 401 && refresh) {
+    console.warn(":warning: Access token expired, trying refresh...");
+
+  
+
+    let refreshRes = await fetch("http://127.0.0.1:8000/token/refresh/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({"refresh": refresh }),
+    });
+   console.log(refreshRes)
+    if (refreshRes.ok) {
+      // new access token
+      const data = await refreshRes.json();
+      localStorage.setItem("access", data.access);
+     // localStorage.setItem("refresh", data.refresh);
+      // retry original request with new access token
+      options.headers["Authorization"] = `Bearer ${data.access}`;
+      response = await fetch(url, options);
+    } else {
+      // refresh token invalid / blacklisted
+      console.error("Refresh token invalid or blacklisted, logging out...");
+
+      // clear localStorage + redirect to login
+      localStorage.clear();
+     // window.location.href = "/login"; // adjust your login page path
+      return; // stop further execution
     }
-    return response;
+  }
+
+  return response;
 }
-
-
-
-
 
 
 
