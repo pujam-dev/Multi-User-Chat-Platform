@@ -71,17 +71,20 @@ async def websocket_endpoint(websocket: WebSocket):
             payload = json.loads(data)
             if payload.get("type") == "chat":
                 sender = payload["sender_id"]
-                receiver = payload["receiver_id"]
+                receiver = payload.get("receiver_id")
                 chatroom = payload["chatroom_id"]
                 content = payload["content"]
                 print(f"🟢 Room {chatroom} | {sender} → {receiver}: {content}")
-                # Django API me save karo
-                response = requests.post(DJANGO_API_URL, json={
-                    "sender_id": sender,
-                    "receiver_id": receiver,
+
+                save_data={
+                     "sender_id": sender,
                     "chatroom_id": chatroom,
                     "content": content
-                })
+                }
+                if receiver:
+                    save_data["receiver_id"]=receiver
+                # Django API me save karo
+                response = requests.post(DJANGO_API_URL, json=save_data)
                 if response.status_code == 201:
                     print("🟢 Message saved in Django")
                 else:

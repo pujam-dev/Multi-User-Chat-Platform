@@ -135,7 +135,7 @@ console.log("chatRoomData",chatRoomData)
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
   async function loadOldMessages(chatroomId) {
-    const response = await fetch(
+    const response = await fetchWithAuth(
       `http://127.0.0.1:8000/messages/?chatroom_id=${chatroomId}`,
       {
         headers: {

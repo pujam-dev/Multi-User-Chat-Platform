@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 //import { useNavigate } from "react-router-dom";
 import { getUsers } from "../api";
-
+import {fetchWithAuth} from "../api"
 
 export default function UserList() {
   //const navigate = useNavigate();
@@ -62,7 +62,7 @@ export default function UserList() {
 
     try {
 
-      const res = await fetch("http://127.0.0.1:8000/chatrooms/private/create/", {
+      const res = await fetchWithAuth("http://127.0.0.1:8000/chatrooms/private/create/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

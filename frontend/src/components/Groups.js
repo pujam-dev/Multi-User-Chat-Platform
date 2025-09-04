@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Card, ListGroup, Spinner } from "react-bootstrap";
-
+import {fetchWithAuth} from "../api"
 export default function Groups() {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ export default function Groups() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(
+        const res = await fetchWithAuth(
           "http://127.0.0.1:8000/chatrooms/public/groups",
           {
             headers: {
@@ -66,7 +66,7 @@ export default function Groups() {
 
   const joinGroup = async (groupId, name, room_type) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/chatrooms/public/crud/${groupId}/`, {
+      const res = await fetchWithAuth(`http://127.0.0.1:8000/chatrooms/public/crud/${groupId}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

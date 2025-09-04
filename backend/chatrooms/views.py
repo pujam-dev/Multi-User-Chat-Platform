@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status,generics
+from rest_framework import status,generics,viewsets
 from rest_framework.views import APIView
 from chatrooms.models import ChatRoom
 from users.models import User
@@ -47,6 +47,10 @@ class PublicChatUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     def get_serializer_context(self):
         return {"request": self.request}
+    
+class ChatRoomViewSet(viewsets.ModelViewSet):
+    queryset = ChatRoom.objects.all()
+    serializer_class = ChatRoomSerializer
 
 #chatrooms where the user is involved like private chatrooms
 class UserChatRoomView(APIView):

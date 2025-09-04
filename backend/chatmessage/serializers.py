@@ -13,3 +13,6 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ["id", "sender_id", "receiver_id", "chatroom_id", "content", "time_stamp",
                   "sender_name", "receiver_name", "chatroom_name"]
         read_only_fields = ["time_stamp"]
+    extra_kwargs={
+        "receiver_id":{"required":False,"allow_null":True}
+    }

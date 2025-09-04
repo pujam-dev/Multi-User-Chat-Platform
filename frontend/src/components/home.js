@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import MyModal from "../MyModal";
 import Groups from "./Groups";
-
+import {fetchWithAuth} from "../api"
+import Logout from "./Logout";
 export default function Home() {
   //const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -15,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/chatrooms/mychats", {
+        const res = await fetchWithAuth("http://127.0.0.1:8000/chatrooms/mychats", {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("access")}`
         }
@@ -63,7 +64,7 @@ export default function Home() {
   const goToChat = async (u) => {
     try {
 
-      const res = await fetch("http://127.0.0.1:8000/chatrooms/private/create/", {
+      const res = await fetchWithAuth("http://127.0.0.1:8000/chatrooms/private/create/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,7 +93,15 @@ export default function Home() {
   return (
     <div className="container py-4">
        <div className="card shadow-sm">
+        <div className="card-header d-flex align-items-center justify-content-between">
+           <h3>Welcome!! {localStorage.getItem('username')}</h3>
+           <button className="btn btn-primary ">Notification</button>
+       
+             <Logout/>
+        </div>
             <div className="card-header d-flex align-items-center justify-content-between">
+             
+             <h3>Chats</h3>
 
               <div className="d-flex" style={{ gap: 8 }}>
                 <input
@@ -103,6 +112,7 @@ export default function Home() {
                   style={{ width: 240 }}
                 />
               </div>
+            
             </div>
 
             <div className="list-group list-group-flush">
