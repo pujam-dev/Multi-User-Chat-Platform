@@ -114,8 +114,7 @@
     alert(":warning: No chatroom found in session!");
     return;
   }
-  // Private ke liye tum JSON me sender, receiver save kar rahi ho
-  // Public group ke liye tum JSON me {id, name, room_type, participants} save karti ho
+
   const {  sender, receiver } = chatRoomDetails;
  
  const chatRoomData = chatRoomDetails.data ? chatRoomDetails.data : chatRoomDetails
@@ -135,7 +134,7 @@ console.log("chatRoomData",chatRoomData)
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
   async function loadOldMessages(chatroomId) {
-    const response = await fetchWithAuth(
+    const response = await fetch(
       `http://127.0.0.1:8000/messages/?chatroom_id=${chatroomId}`,
       {
         headers: {
@@ -193,7 +192,7 @@ console.log("chatRoomData",chatRoomData)
         type: "chat",
         receiver_id: receiver,
         sender_id: sender,
-        chatroom_id: data.id,
+        chatroom_id: chatroomId,
         content: val,
       };
     } else {

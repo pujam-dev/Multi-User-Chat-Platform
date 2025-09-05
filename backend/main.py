@@ -1,4 +1,5 @@
 # main.py
+import asyncio
 import json
 import requests
 from typing import Dict, List
@@ -49,8 +50,78 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@app.websocket("/ws")
 
+
+
+
+
+class NotificationManager:
+    def __init__(self):
+        self.notifications: Dict[str, List[WebSocket]] = {}
+    async def add(self, websocket: WebSocket, user_id: str):
+        if user_id not in self.notifications:
+            self.notifications[user_id] = []
+        self.notifications[user_id].append(websocket)
+        print(f"[notify] added connection for user {user_id} (total={len(self.notifications[user_id])})")
+    def remove(self, websocket: WebSocket):
+        for user_id, conns in list(self.notifications.items()):
+            if websocket in conns:
+                conns.remove(websocket)
+                print(f"[notify] removed connection for user {user_id} (remaining={len(conns)})")
+                if not conns:
+                    del self.notifications[user_id]
+    async def send_notification(self, user_id: str, message: dict):
+        text = json.dumps(message)
+        conns = list(self.notifications.get(user_id, []))
+        print(f"[notify] sending to {user_id} ({len(conns)} conns): {message}")
+        for conn in conns:
+            try:
+                await conn.send_text(text)
+            except Exception as e:
+                print("[notify] send failed, removing conn:", e)
+                self.remove(conn)
+notification_manager = NotificationManager()
+@app.websocket("/ws/notify/{user_id}")
+async def websocket_notify(websocket: WebSocket, user_id: str):
+    # IMPORTANT: Make sure client connects to the exact path (no extra trailing slash)
+    await websocket.accept()
+    await notification_manager.add(websocket, user_id)
+    # Send immediate ack so client can confirm connection established
+    try:
+        await websocket.send_text(json.dumps({"type": "system", "message": "notify_connected"}))
+    except Exception as e:
+        print("[notify] failed to send initial ack:", e)
+    try:
+        # Keep the connection alive without expecting client messages
+        while True:
+            # optional: periodic ping to detect dead connections earlier
+            await asyncio.sleep(30)
+            # Don't spam clients with pings — comment out if not needed
+            try:
+                await websocket.send_text(json.dumps({"type": "ping"}))
+            except Exception:
+                # client disconnected or error => break loop and cleanup
+                break
+    except WebSocketDisconnect:
+        print("[notify] websocket disconnect exception")
+    except Exception as e:
+        print("[notify] exception in notify loop:", e)
+    finally:
+        notification_manager.remove(websocket)
+        try:
+            await websocket.close()
+        except Exception:
+            pass
+
+
+
+
+
+
+
+
+
+@app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
@@ -97,6 +168,15 @@ async def websocket_endpoint(websocket: WebSocket):
                     "sender_id": sender,
                     "receiver_id": receiver
                 })
+
+                
+                if receiver and receiver != sender:
+                    await notification_manager.send_notification(str(receiver),{
+                            "type":"notification",
+                            "chatroom_id":chatroom,
+                            "message":content
+                        })
+
 
     except WebSocketDisconnect:
         left_user, room_id = manager.remove(websocket)
