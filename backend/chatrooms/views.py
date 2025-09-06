@@ -56,19 +56,9 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
 class UserChatRoomView(APIView):
     renderer_classes=[UserRenderer]
     permission_classes=[IsAuthenticated]
-    
-    # def get(self,request):
-    #     user = request.user
-    #     rooms = ChatRoom.objects.filter(participant_id=user)
-    #     other_users=set()
-    #     for room in rooms:
-    #         for u in room.participant_id.exclude(id=user.id):
-    #             other_users.add(u)
-    #     serializer=UserSerializer(list(other_users),many=True)
-    #     return Response({"data":serializer.data},status=status.HTTP_200_OK)
     def get(self, request):
         user = request.user
-        rooms = ChatRoom.objects.filter(participant_id=user)
+        rooms = ChatRoom.objects.filter(participant_id=user,room_type='private')
         user_room_list = []
 
         for room in rooms:

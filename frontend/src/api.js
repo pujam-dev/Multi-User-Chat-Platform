@@ -63,6 +63,8 @@ export const register = async(userData)=>{
  if (data.ok) {
     localStorage.setItem("access",json.token.access);
     localStorage.setItem("refresh",json.token.refresh);
+    localStorage.setItem("userid",json.data.userid);
+    localStorage.setItem("username",json.data.username);
  }
  return json
 }

@@ -26,7 +26,7 @@ export default function Home() {
           }
         );
         const data = await res.json();
-        //console.log("my chats",data.data[0].chatroom_id)
+        console.log("my chats",data.data)
         const chatroom_id = data.data[0].chatroom_id;
         //  setUsers(Array.isArray(data.data) ? data.data : []);
         setUsers(
@@ -58,11 +58,6 @@ export default function Home() {
       try {
         const data = JSON.parse(ev.data);
         console.log("Notify message:", data);
-        // if (data.type === "notify" || data.type === "notification") {
-        //   // update UI: increment unread counter, show toast, etc.
-        //   //  alert("new message")
-        //   setNot("New Message");
-        // }
         if (data.type === "notify" || data.type === "notification") {
           // Update specific user's new_message flag
           setUsers((prevUsers) =>
