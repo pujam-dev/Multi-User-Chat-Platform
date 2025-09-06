@@ -11,6 +11,7 @@ export default function Home() {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [not,setNot]=useState("no new msgs")
   //const username = localStorage.getItem("username")
   const userid = localStorage.getItem("userid")
   useEffect(() => {
@@ -53,7 +54,8 @@ export default function Home() {
       console.log("Notify message:", data);
       if (data.type === "notify" || data.type === "notification") {
         // update UI: increment unread counter, show toast, etc.
-        alert("new message")
+      //  alert("new message")
+        setNot("New Message")
       }
     } catch (err) {
       console.log("Notify: non-json", ev.data);
@@ -188,6 +190,7 @@ export default function Home() {
                   <div>
                     <div className="fw-semibold">{displayName(u)}</div>
                     <div className="text-muted small">{u.email || "-"}</div>
+                    <div className="text-danger">{not}</div>
                   </div>
                 </div>
 
