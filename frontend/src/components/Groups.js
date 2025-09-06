@@ -97,6 +97,7 @@ export default function Groups() {
                   {(g.participant_id).length || 0} members
                 </div>
               </div>
+              <div className="d-flex gap-4">
               <Button
                 variant="primary"
                 size="sm"
@@ -112,6 +113,8 @@ export default function Groups() {
               >
                 {g.joined ? "Chat" : "Join"}
               </Button>
+              <button className="btn btn-danger border">Leave</button>
+              </div>
             </ListGroup.Item>
           ))}
       </ListGroup>

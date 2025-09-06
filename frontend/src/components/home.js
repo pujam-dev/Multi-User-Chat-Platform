@@ -11,7 +11,6 @@ export default function Home() {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const [not, setNot] = useState("no new msgs");
   //const username = localStorage.getItem("username")
   const userid = localStorage.getItem("userid");
   useEffect(() => {

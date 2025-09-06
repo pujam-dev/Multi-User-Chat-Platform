@@ -92,7 +92,7 @@ export const getUsers = async () => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,  // 👈 yaha token bhejna zaroori hai
+      "Authorization": `Bearer ${token}`, 
     },
   });
 
@@ -108,7 +108,7 @@ export const createGroup= async (userData)=>{
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,  // 👈 yaha token bhejna zaroori hai
+      "Authorization": `Bearer ${token}`, 
     },body:JSON.stringify(userData)
   });
   const data = await res.json()
