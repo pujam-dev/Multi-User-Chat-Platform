@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import MyModal from "../MyModal";
 import Groups from "./Groups";
-import { fetchWithAuth } from "../api"
+import { fetchWithAuth } from "../api";
 import Logout from "./Logout";
 export default function Home() {
   //const navigate = useNavigate();
@@ -11,20 +11,29 @@ export default function Home() {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const [not,setNot]=useState("no new msgs")
+  const [not, setNot] = useState("no new msgs");
   //const username = localStorage.getItem("username")
-  const userid = localStorage.getItem("userid")
+  const userid = localStorage.getItem("userid");
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetchWithAuth("http://127.0.0.1:8000/chatrooms/mychats", {
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("access")}`
+        const res = await fetchWithAuth(
+          "http://127.0.0.1:8000/chatrooms/mychats",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access")}`,
+            },
           }
-        })
-        const data = await res.json()
-        console.log(data.data)
-        setUsers(Array.isArray(data.data) ? data.data : []);
+        );
+        const data = await res.json();
+        //console.log("my chats",data.data[0].chatroom_id)
+        const chatroom_id = data.data[0].chatroom_id;
+        //  setUsers(Array.isArray(data.data) ? data.data : []);
+        setUsers(
+          Array.isArray(data.data)
+            ? data.data.map((u) => ({ ...u, new_message: false })) // initially no new message
+            : []
+        );
       } catch (e) {
         setErr("Unable to load users");
       } finally {
@@ -33,44 +42,48 @@ export default function Home() {
     })();
   }, []);
 
-
-//2
-
-
+  //2
 
   useEffect(() => {
-  const userId = localStorage.getItem("userid");
-  if (!userId) return;
-  // make sure the host:port + path matches your FastAPI server
-  const wsUrl = `ws://127.0.0.1:9000/ws/notify/${userId}`; // change port if needed
-  console.log("connecting notify ws:", wsUrl);
-  const ws = new WebSocket(wsUrl);
-  ws.onopen = () => {
-    console.log("Notify WS open");
-  };
-  ws.onmessage = (ev) => {
-    try {
-      const data = JSON.parse(ev.data);
-      console.log("Notify message:", data);
-      if (data.type === "notify" || data.type === "notification") {
-        // update UI: increment unread counter, show toast, etc.
-      //  alert("new message")
-        setNot("New Message")
+    const userId = localStorage.getItem("userid");
+    if (!userId) return;
+    // make sure the host:port + path matches your FastAPI server
+    const wsUrl = `ws://127.0.0.1:9000/ws/notify/${userId}`; // change port if needed
+    console.log("connecting notify ws:", wsUrl);
+    const ws = new WebSocket(wsUrl);
+    ws.onopen = () => {
+      console.log("Notify WS open");
+    };
+    ws.onmessage = (ev) => {
+      try {
+        const data = JSON.parse(ev.data);
+        console.log("Notify message:", data);
+        // if (data.type === "notify" || data.type === "notification") {
+        //   // update UI: increment unread counter, show toast, etc.
+        //   //  alert("new message")
+        //   setNot("New Message");
+        // }
+        if (data.type === "notify" || data.type === "notification") {
+          // Update specific user's new_message flag
+          setUsers((prevUsers) =>
+            prevUsers.map((u) =>
+              u.chatroom_id === data.chatroom_id
+                ? { ...u, new_message: true }
+                : u
+            )
+          );
+        }
+      } catch (err) {
+        console.log("Notify: non-json", ev.data);
       }
-    } catch (err) {
-      console.log("Notify: non-json", ev.data);
-    }
-  };
-  ws.onerror = (err) => {
-    console.error("Notify WS error", err);
-  };
-  ws.onclose = (evt) => {
-    console.warn("Notify WS closed", evt.code, evt.reason);
-  };
-
-}, []);
-
-
+    };
+    ws.onerror = (err) => {
+      console.error("Notify WS error", err);
+    };
+    ws.onclose = (evt) => {
+      console.warn("Notify WS closed", evt.code, evt.reason);
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -82,10 +95,11 @@ export default function Home() {
         [u.first_name, u.last_name].filter(Boolean).join(" ") ||
         "";
       const email = u.email || "";
-      return name.toLowerCase().includes(term) || email.toLowerCase().includes(term);
+      return (
+        name.toLowerCase().includes(term) || email.toLowerCase().includes(term)
+      );
     });
   }, [q, users]);
-
 
   const displayName = (u) =>
     u.name ||
@@ -96,23 +110,25 @@ export default function Home() {
   const initials = (u) => {
     const n = displayName(u).trim();
     const parts = n.split(/\s+/).slice(0, 2);
-    return parts.map(p => p[0]?.toUpperCase() || "").join("");
+    return parts.map((p) => p[0]?.toUpperCase() || "").join("");
   };
 
   const goToChat = async (u) => {
     try {
-
-      const res = await fetchWithAuth("http://127.0.0.1:8000/chatrooms/private/create/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("access")}`
-        },
-        body: JSON.stringify({
-          user1: userid,
-          user2: u.id
-        }),
-      });
+      const res = await fetchWithAuth(
+        "http://127.0.0.1:8000/chatrooms/private/create/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
+          },
+          body: JSON.stringify({
+            user1: userid,
+            user2: u.id,
+          }),
+        }
+      );
       //console.log(userid, u.id)
       const data = await res.json();
       if (res.ok) {
@@ -132,13 +148,12 @@ export default function Home() {
     <div className="container py-4">
       <div className="card shadow-sm">
         <div className="card-header d-flex align-items-center justify-content-between">
-          <h3>Welcome!! {localStorage.getItem('username')}</h3>
+          <h3>Welcome!! {localStorage.getItem("username")}</h3>
           <button className="btn btn-primary ">Notification</button>
 
           <Logout />
         </div>
         <div className="card-header d-flex align-items-center justify-content-between">
-
           <h3>Chats</h3>
 
           <div className="d-flex" style={{ gap: 8 }}>
@@ -150,7 +165,6 @@ export default function Home() {
               style={{ width: 240 }}
             />
           </div>
-
         </div>
 
         <div className="list-group list-group-flush">
@@ -190,7 +204,10 @@ export default function Home() {
                   <div>
                     <div className="fw-semibold">{displayName(u)}</div>
                     <div className="text-muted small">{u.email || "-"}</div>
-                    <div className="text-danger">{not}</div>
+                    {/* <div className="text-danger">{not}</div> */}
+                    <div className="text-danger">
+                      {u.new_message ? "New Message" : "no new msg"}
+                    </div>
                   </div>
                 </div>
 
