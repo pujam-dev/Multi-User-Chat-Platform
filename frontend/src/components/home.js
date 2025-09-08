@@ -97,6 +97,7 @@ export default function Home() {
   }, [q, users]);
 
   const displayName = (u) =>
+
     u.name ||
     u.username ||
     [u.first_name, u.last_name].filter(Boolean).join(" ") ||
@@ -171,7 +172,7 @@ export default function Home() {
               }}
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
-              {initials(username)}
+              {(username.split(/\s+/).slice(0, 2)).map((p) => p[0]?.toUpperCase() || "").join("")}
             </div>
 
             {dropdownOpen && (
@@ -179,11 +180,11 @@ export default function Home() {
                 className="position-absolute bg-white border rounded shadow"
                 style={{ top: "50px", right: 0, minWidth: "150px", zIndex: 10 }}
               >
-                <button className="dropdown-item" onClick={handleProfileClick}>
+                <button className="dropdown-item m-2 border" onClick={handleProfileClick}>
                   Profile
                 </button>
                 <button
-                  className="dropdown-item text-danger"
+                  className="dropdown-item text-danger m-2"
                   onClick={handleLogoutClick}
                 >
                   Logout

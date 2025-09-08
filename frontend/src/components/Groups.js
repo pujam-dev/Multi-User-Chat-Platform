@@ -113,7 +113,7 @@ export default function Groups() {
               >
                 {g.joined ? "Chat" : "Join"}
               </Button>
-              <button className="btn btn-danger border">Leave</button>
+              {/* <button className="btn btn-danger border">Leave</button> */}
               </div>
             </ListGroup.Item>
           ))}
