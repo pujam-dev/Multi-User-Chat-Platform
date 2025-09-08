@@ -14,6 +14,45 @@ export default function Home() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const username = localStorage.getItem("username")
   const userid = localStorage.getItem("userid");
+const [formData, setFormData] = useState({
+    name: "",
+    avatar:"",
+  });
+
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetchWithAuth(
+          "http://127.0.0.1:8000/auth/user/profile/",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access")}`,
+            },
+          }
+        );
+        const data = await res.json();
+        console.log("Combined Profile Data:", data);
+
+        if (res.ok) {
+          setFormData({
+            name: data.name || "",
+            avatar:data.avatar || ""
+          });
+        } else {
+          setErr("Failed to load profile");
+        }
+      } catch (error) {
+        setErr("Error fetching profile");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+
+
   useEffect(() => {
     (async () => {
       try {
@@ -28,10 +67,9 @@ export default function Home() {
         const data = await res.json();
         console.log("my chats", data.data);
         const chatroom_id = data.data[0].chatroom_id;
-        //  setUsers(Array.isArray(data.data) ? data.data : []);
         setUsers(
           Array.isArray(data.data)
-            ? data.data.map((u) => ({ ...u, new_message: false })) // initially no new message
+            ? data.data.map((u) => ({ ...u, new_message: false })) 
             : []
         );
       } catch (e) {
@@ -47,8 +85,7 @@ export default function Home() {
   useEffect(() => {
     const userId = localStorage.getItem("userid");
     if (!userId) return;
-    // make sure the host:port + path matches your FastAPI server
-    const wsUrl = `ws://127.0.0.1:9000/ws/notify/${userId}`; // change port if needed
+    const wsUrl = `ws://127.0.0.1:9000/ws/notify/${userId}`; 
     console.log("connecting notify ws:", wsUrl);
     const ws = new WebSocket(wsUrl);
     ws.onopen = () => {
@@ -59,7 +96,7 @@ export default function Home() {
         const data = JSON.parse(ev.data);
         console.log("Notify message:", data);
         if (data.type === "notify" || data.type === "notification") {
-          // Update specific user's new_message flag
+        
           setUsers((prevUsers) =>
             prevUsers.map((u) =>
               u.chatroom_id === data.chatroom_id
@@ -151,18 +188,26 @@ export default function Home() {
   return (
     <div className="container py-4 ">
       <div className="card shadow-lg ">
-        {/* <div className="card-header d-flex align-items-center justify-content-between">
-          <h3>Welcome!! {localStorage.getItem("username")}</h3>
-          <button className="btn btn-primary ">Notification</button>
-
-          <Logout />
-        </div> */}
         <div className="card-header d-flex align-items-center justify-content-between">
           <h3>Welcome, {username}</h3>
 
           {/* Avatar + Dropdown */}
           <div className="position-relative">
-            <div
+           {formData.avatar ? 
+            <img
+            src={`http://127.0.0.1:8000/auth/user${formData.avatar}`}
+              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+              style={{
+                width: "40px",
+                height: "40px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+            </img>
+             :
+              <div
               className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
               style={{
                 width: "40px",
@@ -173,21 +218,20 @@ export default function Home() {
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               {(username.split(/\s+/).slice(0, 2)).map((p) => p[0]?.toUpperCase() || "").join("")}
-            </div>
-
+            </div>}
             {dropdownOpen && (
               <div
                 className="position-absolute bg-white border rounded shadow"
                 style={{ top: "50px", right: 0, minWidth: "150px", zIndex: 10 }}
               >
-                <button className="dropdown-item m-2 border" onClick={handleProfileClick}>
+                <button className="dropdown-item m-2 " onClick={handleProfileClick}>
                   Profile
                 </button>
                 <button
-                  className="dropdown-item text-danger m-2"
+                  className="dropdown-item "
                   onClick={handleLogoutClick}
                 >
-                  Logout
+                  <Logout/>
                 </button>
               </div>
             )}
@@ -262,11 +306,10 @@ export default function Home() {
             ))}
         </div>
       </div>
-
       <MyModal msg="+" />
-      <h3>Public Groups</h3>
+     
       <Groups />
-      <MyModal msg="Create Group" />
+     
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card, ListGroup, Spinner } from "react-bootstrap";
 import {fetchWithAuth} from "../api"
+import MyModal from "../MyModal";
 export default function Groups() {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +69,8 @@ export default function Groups() {
 
 
   return (
+    <div>
+       <h3>Public Groups</h3>
     <Card className="mt-4 shadow-sm">
       <Card.Header>Available Groups</Card.Header>
       <ListGroup variant="flush">
@@ -119,5 +122,7 @@ export default function Groups() {
           ))}
       </ListGroup>
     </Card>
+     <MyModal msg="Create Group" />
+     </div>
   );
 }

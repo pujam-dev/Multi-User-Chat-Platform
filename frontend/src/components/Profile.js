@@ -112,7 +112,7 @@ export default function Profile() {
       <div className="text-center mb-4">
         {profile.avatar ? (
           <img
-            src={profile.avatar}
+            src={`http://127.0.0.1:8000/auth/user${profile.avatar}`}
             alt="User Avatar"
             className="rounded-circle border"
             style={{
@@ -215,14 +215,6 @@ export default function Profile() {
         </button>
       </form>
 
-      <div className="mt-4 p-3 bg-white rounded shadow-sm">
-        <h5>Profile Information</h5>
-        <p><strong>Name:</strong> {profile.name}</p>
-        <p><strong>Email:</strong> {profile.email}</p>
-        <p><strong>Date of Birth:</strong> {profile.date_of_birth}</p>
-        <p><strong>Bio:</strong> {profile.bio}</p>
-        <p><strong>Status:</strong> {profile.status}</p>
-      </div>
     </div>
 
 

@@ -38,11 +38,11 @@ const handleSubmit = async (e) => {
 };
 
   return (
-    <div className="text-center mt-5">
-      <button className="btn btn-primary" onClick={handleSubmit}>
+    <>
+      <button  onClick={handleSubmit}>
         Logout
       </button>
-    </div>
+    </>
   );
 };
 
