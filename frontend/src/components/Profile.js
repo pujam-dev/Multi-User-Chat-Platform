@@ -11,6 +11,8 @@ export default function Profile() {
     email: "",
     name: "",
     date_of_birth: "",
+    bio: "",
+    status: "",
   });
 
   useEffect(() => {
@@ -18,20 +20,24 @@ export default function Profile() {
       try {
         const res = await fetchWithAuth(
           "http://127.0.0.1:8000/auth/user/profile/",
-          {method:"GET",
+          {
+            method: "GET",
             headers: {
               Authorization: `Bearer ${localStorage.getItem("access")}`,
             },
           }
         );
         const data = await res.json();
-        console.log("profile get api",data)
+        console.log("Combined Profile Data:", data);
+
         if (res.ok) {
           setProfile(data);
           setFormData({
-            name: data.name || "",
-            date_of_birt: data.date_of_birt || "",
             email: data.email || "",
+            name: data.name || "",
+            date_of_birth: data.date_of_birth || "",
+            bio: data.bio || "",
+            status: data.status || "",
           });
         } else {
           setErr("Failed to load profile");
@@ -53,17 +59,23 @@ export default function Profile() {
     setErr("");
     setSuccessMsg("");
     try {
-      const res = await fetchWithAuth("http://127.0.0.1:8000/auth/user/profile/", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access")}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetchWithAuth(
+        "http://127.0.0.1:8000/auth/user/profile/",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access")}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       const data = await res.json();
       if (res.ok) {
-        setProfile(data.data);
+        setProfile((prev) => ({
+          ...prev,
+          ...data.data,
+        }));
         setSuccessMsg("Profile updated successfully");
       } else {
         setErr("Failed to update profile");
@@ -76,41 +88,116 @@ export default function Profile() {
   if (loading) return <div>Loading profile...</div>;
 
   return (
-    <div className="container py-4">
-      <h3>User Profile</h3>
-      {err && <div className="alert alert-danger">{err}</div>}
-      {successMsg && <div className="alert alert-success">{successMsg}</div>}
+<div className="container py-5" style={{ maxWidth: "600px", backgroundColor: "#f8f9fa", borderRadius: "10px", boxShadow: "0 0 10px rgba(0,0,0,0.1)" }}>
+  <h3 className="text-center mb-4">User Profile</h3>
 
-      <form onSubmit={handleUpdate}>
-        <div className="mb-3">
-          <label className="form-label">Bio</label>
-          <textarea
-            name="bio"
-            className="form-control"
-            value={formData.bio}
-            onChange={handleChange}
-          />
-        </div>
+  {err && <div className="alert alert-danger">{err}</div>}
+  {successMsg && <div className="alert alert-success">{successMsg}</div>}
 
-        <div className="mb-3">
-          <label className="form-label">Status</label>
-          <input
-            type="text"
-            name="location"
-            className="form-control"
-            value={formData.status}
-            onChange={handleChange}
-          />
-        </div>
+  {/* Avatar */}
+  <div className="text-center mb-4">
+    {profile.avatar ? (
+      <img
+        src={profile.avatar}
+        alt="User Avatar"
+        className="rounded-circle border"
+        style={{
+          width: "120px",
+          height: "120px",
+          objectFit: "cover",
+          border: "3px solid #007bff",
+        }}
+      />
+    ) : (
+      <div
+        className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+        style={{
+          width: "120px",
+          height: "120px",
+          fontSize: "48px",
+          border: "3px solid #007bff",
+        }}
+      >
+        {profile.name ? profile.name[0].toUpperCase() : "U"}
+      </div>
+    )}
+  </div>
 
-        <button type="submit" className="btn btn-primary">
-          Update Profile
-        </button>
-      </form>
-      <h1>{profile.avatar}
-      {profile.bio}
-      {profile.status}</h1>
-      <h1>hy</h1>
+  <form onSubmit={handleUpdate}>
+    <div className="mb-3">
+      <label className="form-label">Name</label>
+      <input
+        type="text"
+        name="name"
+        className="form-control"
+        value={formData.name}
+        onChange={handleChange}
+        placeholder="Enter your full name"
+      />
     </div>
+
+    <div className="mb-3">
+      <label className="form-label">Email</label>
+      <input
+        type="email"
+        name="email"
+        className="form-control"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="you@example.com"
+      />
+    </div>
+
+    <div className="mb-3">
+      <label className="form-label">Date of Birth</label>
+      <input
+        type="date"
+        name="date_of_birth"
+        className="form-control"
+        value={formData.date_of_birth}
+        onChange={handleChange}
+      />
+    </div>
+
+    <div className="mb-3">
+      <label className="form-label">Bio</label>
+      <textarea
+        name="bio"
+        className="form-control"
+        rows="3"
+        value={formData.bio}
+        onChange={handleChange}
+        placeholder="Tell us something about yourself..."
+      />
+    </div>
+
+    <div className="mb-3">
+      <label className="form-label">Status</label>
+      <input
+        type="text"
+        name="status"
+        className="form-control"
+        value={formData.status}
+        onChange={handleChange}
+        placeholder="Your current status"
+      />
+    </div>
+
+    <button type="submit" className="btn btn-primary w-100">
+      Update Profile
+    </button>
+  </form>
+
+  <div className="mt-4 p-3 bg-white rounded shadow-sm">
+    <h5>Profile Information</h5>
+    <p><strong>Name:</strong> {profile.name}</p>
+    <p><strong>Email:</strong> {profile.email}</p>
+    <p><strong>Date of Birth:</strong> {profile.date_of_birth}</p>
+    <p><strong>Bio:</strong> {profile.bio}</p>
+    <p><strong>Status:</strong> {profile.status}</p>
+  </div>
+</div>
+
+
   );
 }

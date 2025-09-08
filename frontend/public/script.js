@@ -118,7 +118,7 @@
   const {  sender, receiver } = chatRoomDetails;
  
  const chatRoomData = chatRoomDetails.data ? chatRoomDetails.data : chatRoomDetails
-console.log("chatRoomData",chatRoomData)
+ console.log("chatRoomData",chatRoomData)
   const {id,room_type,name}=chatRoomData
   const chatroomId=id
   const wsUrl = "ws://127.0.0.1:9000/ws";

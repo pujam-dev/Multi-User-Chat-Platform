@@ -52,17 +52,34 @@ class UserLoginView(APIView):
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class UserProfileView(APIView):
-    renderer_classes=[UserRenderer]
-    permission_classes=[IsAuthenticated]
-    def get(self,request,fromat=None):
-        serializer=UserProfileSerializer(request.user.profile)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    def put(self,request):
-        serializer=UserProfileSerializer(request.user.profile,data=request.data,partial=True)
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        profile_data = UserProfileSerializer(request.user.profile).data
+        user_data = UserSerializer(request.user).data
+        
+        combined_data = {
+            **user_data,
+            **profile_data
+        }
+        
+        return Response(combined_data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        serializer = UserProfileSerializer(
+            request.user.profile,
+            data=request.data,
+            partial=True
+        )
         if serializer.is_valid():
             serializer.save()
-            return Response({"msg":"Profile updated","data":serializer.data})
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                "msg": "Profile updated",
+                "data": serializer.data
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
              
 
 class LogoutView(APIView):

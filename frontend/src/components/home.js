@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import MyModal from "../MyModal";
 import Groups from "./Groups";
 import { fetchWithAuth } from "../api";
 import Logout from "./Logout";
 export default function Home() {
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  //const username = localStorage.getItem("username")
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const username = localStorage.getItem("username")
   const userid = localStorage.getItem("userid");
   useEffect(() => {
     (async () => {
@@ -25,7 +26,7 @@ export default function Home() {
           }
         );
         const data = await res.json();
-        console.log("my chats",data.data)
+        console.log("my chats", data.data);
         const chatroom_id = data.data[0].chatroom_id;
         //  setUsers(Array.isArray(data.data) ? data.data : []);
         setUsers(
@@ -137,15 +138,59 @@ export default function Home() {
       console.error("Error:", err);
     }
   };
+  const handleProfileClick = () => {
+    navigate("/profile"); // Navigate to Profile Page
+  };
+
+  const handleLogoutClick = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
 
   return (
-    <div className="container py-4">
-      <div className="card shadow-sm">
-        <div className="card-header d-flex align-items-center justify-content-between">
+    <div className="container py-4 ">
+      <div className="card shadow-lg ">
+        {/* <div className="card-header d-flex align-items-center justify-content-between">
           <h3>Welcome!! {localStorage.getItem("username")}</h3>
           <button className="btn btn-primary ">Notification</button>
 
           <Logout />
+        </div> */}
+        <div className="card-header d-flex align-items-center justify-content-between">
+          <h3>Welcome, {username}</h3>
+
+          {/* Avatar + Dropdown */}
+          <div className="position-relative">
+            <div
+              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+              style={{
+                width: "40px",
+                height: "40px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+              {initials(username)}
+            </div>
+
+            {dropdownOpen && (
+              <div
+                className="position-absolute bg-white border rounded shadow"
+                style={{ top: "50px", right: 0, minWidth: "150px", zIndex: 10 }}
+              >
+                <button className="dropdown-item" onClick={handleProfileClick}>
+                  Profile
+                </button>
+                <button
+                  className="dropdown-item text-danger"
+                  onClick={handleLogoutClick}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         <div className="card-header d-flex align-items-center justify-content-between">
           <h3>Chats</h3>
