@@ -53,23 +53,35 @@ export default function Profile() {
   }, []);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    // setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const {name,value,files}=e.target
+    if ( name === "avatar"){
+      setFormData((prev)=>({...prev, avatar:files[0]}))
+    } else{
+      setFormData((prev)=>({...prev,[name]:value}))
+    }
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     setErr("");
     setSuccessMsg("");
+
+    const formDataToSend= new FormData();
+    formDataToSend.append("bio",formData.bio)
+    formDataToSend.append("status",formData.status)
+    formDataToSend.append("avatar",formData.avatar)
+
+
     try {
       const res = await fetchWithAuth(
         "http://127.0.0.1:8000/auth/user/profile/",
         {
           method: "PUT",
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("access")}`,
           },
-          body: JSON.stringify(formData),
+          body:formDataToSend,
         }
       );
       const data = await res.json();
@@ -168,9 +180,9 @@ export default function Profile() {
             name="avatar"
             className="form-control"
             rows="3"
-            value={formData.avatar}
             onChange={handleChange}
             placeholder="Upload ur avatar here"
+            accept="image/*"
           />
         </div>
 

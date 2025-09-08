@@ -32,6 +32,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    avatar=serializers.ImageField(required=False)
     class Meta:
         model=Profile
         fields=['avatar','status','bio']

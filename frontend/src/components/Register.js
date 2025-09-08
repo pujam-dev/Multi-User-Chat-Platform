@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { register } from "../api";
-import { Link, useNavigate } from "react-router-dom";   // ✅ import navigate
+import { Link, useNavigate } from "react-router-dom"; 
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -12,7 +12,7 @@ const Register = () => {
     tc: true,
   });
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();   // ✅ initialize navigate
+  const navigate = useNavigate(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +31,7 @@ const Register = () => {
      
       if (res && !res.errors) {
            setMessage(" Registration successful!");
-        // ✅ redirect to Home after 1 sec
+       
         setTimeout(() => {
           navigate("/home");
         }, 500);
