@@ -14,6 +14,7 @@ export default function Home() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const username = localStorage.getItem("username")
   const userid = localStorage.getItem("userid");
+  const [viewMode, setViewMode] = useState("chats");
 const [formData, setFormData] = useState({
     name: "",
     avatar:"",
@@ -187,9 +188,30 @@ const [formData, setFormData] = useState({
 
   return (
     <div className="container py-4 ">
+       {viewMode === "chats" ? (
+        <>
       <div className="card shadow-lg ">
         <div className="card-header d-flex align-items-center justify-content-between">
           <h3>Welcome, {username}</h3>
+
+           <div>
+          <button
+            className={`btn me-2 ${
+              viewMode === "chats" ? "btn-primary" : "btn-outline-primary"
+            }`}
+            onClick={() => setViewMode("chats")}
+          >
+            Chats
+          </button>
+          <button
+            className={`btn ${
+              viewMode === "groups" ? "btn-primary" : "btn-outline-primary"
+            }`}
+            onClick={() => setViewMode("groups")}
+          >
+            Groups
+          </button>
+        </div>
 
           {/* Avatar + Dropdown */}
           <div className="position-relative">
@@ -307,8 +329,10 @@ const [formData, setFormData] = useState({
         </div>
       </div>
       <MyModal msg="+" />
-     
-      <Groups />
+     </>
+     ): (
+        <Groups />  
+      )}
      
     </div>
   );

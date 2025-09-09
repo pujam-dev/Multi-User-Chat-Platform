@@ -13,7 +13,7 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ChatRoomViewSet, PublicChatList, PrivateChatView, UserChatRoomView,PublicChatUpdateDelete
+from .views import ChatRoomViewSet, PublicChatList, PrivateChatView, UserChatRoomView,PublicChatUpdateDelete,LeaveGroupView
 router = DefaultRouter()
 router.register(r'public/crud', ChatRoomViewSet, basename="publicgroup")
 urlpatterns = [
@@ -21,6 +21,8 @@ urlpatterns = [
     path('private/create/', PrivateChatView.as_view(), name='privateroomcreate'),
     path('public/groups/', PublicChatList.as_view(), name='publicgroups'),
     path('public/delete/<int:pk>', PublicChatUpdateDelete.as_view(), name='publicgroupdelete'),
+    path('public/leave/<int:pk>/', LeaveGroupView.as_view(), name='publicgroupleave'),
+
     path("mychats/", UserChatRoomView.as_view(), name="mychats"),
     path('', include(router.urls)),
 ]

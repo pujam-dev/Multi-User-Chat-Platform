@@ -70,6 +70,24 @@ class UserChatRoomView(APIView):
                     "chatroom_id": room.id
                 })
         return Response({"data": user_room_list}, status=status.HTTP_200_OK)
+    
+
+class LeaveGroupView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        user = request.user  # Logged in user
+        try:
+            group = ChatRoom.objects.get(id=pk, room_type="public")
+        except ChatRoom.DoesNotExist:
+            return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if user in group.participant_id.all():
+            group.participant_id.remove(user)  # Remove user from participants
+            group.save()
+            return Response({"msg": "Left group successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "User not in group"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
