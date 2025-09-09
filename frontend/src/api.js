@@ -1,46 +1,46 @@
 import Logout from "./components/Logout";
 
-const API_URL="http://127.0.0.1:8000/auth/user";
- const token = localStorage.getItem("access");
+const API_URL = "http://127.0.0.1:8000/auth/user";
+const token = sessionStorage.getItem("access");
 
 
 
 export async function fetchWithAuth(url, options = {}) {
-  let access = localStorage.getItem("access");
-  let refresh = localStorage.getItem("refresh");
+  let access = sessionStorage.getItem("access");
+  let refresh = sessionStorage.getItem("refresh");
   //console.log("options",options)
   if (!options.headers) options.headers = {};
   options.headers["Authorization"] = `Bearer ${access}`;
-   if (!(options.body instanceof FormData)){
-        options.headers["Content-Type"]="application/json" 
-      }
+  if (!(options.body instanceof FormData)) {
+    options.headers["Content-Type"] = "application/json"
+  }
 
   let response = await fetch(url, options);
 
- 
+
   if (response.status === 401 && refresh) {
     console.warn(":warning: Access token expired, trying refresh...");
 
-  
+
 
     let refreshRes = await fetch("http://127.0.0.1:8000/token/refresh/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({"refresh": refresh }),
+      body: JSON.stringify({ "refresh": refresh }),
     });
 
-   console.log(refreshRes)
+    console.log(refreshRes)
     if (refreshRes.ok) {
       const data = await refreshRes.json();
-      localStorage.setItem("access", data.access);
+      sessionStorage.setItem("access", data.access);
       options.headers["Authorization"] = `Bearer ${data.access}`;
-     
+
       response = await fetch(url, options);
     } else {
       console.error("Refresh token invalid or blacklisted, logging out...");
 
-      localStorage.clear();
-      return; 
+      sessionStorage.clear();
+      return;
     }
   }
 
@@ -50,38 +50,38 @@ export async function fetchWithAuth(url, options = {}) {
 
 
 
-export const register = async(userData)=>{
- const data = await fetch(`${API_URL}/register/`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(userData)
- })
- const json = await data.json()
-//console.log(json)
- if (data.ok) {
-    localStorage.setItem("access",json.token.access);
-    localStorage.setItem("refresh",json.token.refresh);
-    localStorage.setItem("userid",json.data.userid);
-    localStorage.setItem("username",json.data.username);
- }
- return json
+export const register = async (userData) => {
+  const data = await fetch(`${API_URL}/register/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData)
+  })
+  const json = await data.json()
+  //console.log(json)
+  if (data.ok) {
+    sessionStorage.setItem("access", json.token.access);
+    sessionStorage.setItem("refresh", json.token.refresh);
+    sessionStorage.setItem("userid", json.data.userid);
+    sessionStorage.setItem("username", json.data.username);
+  }
+  return json
 }
 
-export const login = async(userData)=>{
- const data = await fetch(`${API_URL}/login/`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(userData)
- })
- const json = await data.json()
+export const login = async (userData) => {
+  const data = await fetch(`${API_URL}/login/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData)
+  })
+  const json = await data.json()
 
- if (data.ok) {
-    localStorage.setItem("access",json.token.access);
-    localStorage.setItem("refresh",json.token.refresh);
-     localStorage.setItem("userid",json.data.userid);
-    localStorage.setItem("username",json.data.username);
- }
- return json
+  if (data.ok) {
+    sessionStorage.setItem("access", json.token.access);
+    sessionStorage.setItem("refresh", json.token.refresh);
+    sessionStorage.setItem("userid", json.data.userid);
+    sessionStorage.setItem("username", json.data.username);
+  }
+  return json
 }
 
 export const getUsers = async () => {
@@ -90,7 +90,7 @@ export const getUsers = async () => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`, 
+      "Authorization": `Bearer ${token}`,
     },
   });
 
@@ -101,19 +101,19 @@ export const getUsers = async () => {
   return await res.json();
 };
 
-export const createGroup= async (userData)=>{
-     const res = await fetchWithAuth(`http://127.0.0.1:8000/chatrooms/public/create/`, {
+export const createGroup = async (userData) => {
+  const res = await fetchWithAuth(`http://127.0.0.1:8000/chatrooms/public/create/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`, 
-    },body:JSON.stringify(userData)
+      "Authorization": `Bearer ${token}`,
+    }, body: JSON.stringify(userData)
   });
   const data = await res.json()
-//  console.log(data)
-    if (!res.ok) {
+  //  console.log(data)
+  if (!res.ok) {
     throw new Error("Failed to create group");
   }
- return data;
+  return data;
 }
 

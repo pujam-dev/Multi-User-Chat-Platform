@@ -24,7 +24,7 @@ export default function Profile() {
           {
             method: "GET",
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("access")}`,
+              Authorization: `Bearer ${sessionStorage.getItem("access")}`,
             },
           }
         );
@@ -79,7 +79,7 @@ export default function Profile() {
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("access")}`,
           },
           body:formDataToSend,
         }

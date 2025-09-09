@@ -5,8 +5,8 @@ const Logout = () => {
 
 const handleSubmit = async (e) => {
     e.preventDefault();
-    const access = localStorage.getItem("access");
-    const refresh = localStorage.getItem("refresh");
+    const access = sessionStorage.getItem("access");
+    const refresh = sessionStorage.getItem("refresh");
 
     if (!refresh) return alert("No refresh token found");
 
@@ -30,7 +30,7 @@ const handleSubmit = async (e) => {
     console.log(data);
 
     if (response.ok) {
-        localStorage.clear();
+        sessionStorage.clear();
         window.location.href = "/login";
     } else {
         alert(data?.error || "Logout failed");

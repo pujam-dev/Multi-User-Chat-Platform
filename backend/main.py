@@ -7,7 +7,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import uvicorn
 app = FastAPI()
 DJANGO_API_URL = "http://127.0.0.1:8000/messages/"
-# Room wise connection manager
+
 class ConnectionManager:
     def __init__(self):
         # room_id -> list of connections
@@ -18,7 +18,7 @@ class ConnectionManager:
         self.user_rooms: Dict[WebSocket, str] = {}
 
     async def add(self, websocket: WebSocket, username: str, room_id: str):
-        # user join karega room_id me
+        
         if room_id not in self.rooms:
             self.rooms[room_id] = []
         self.rooms[room_id].append(websocket)
@@ -31,7 +31,7 @@ class ConnectionManager:
         room_id = self.user_rooms.pop(websocket, None)
         if room_id and websocket in self.rooms.get(room_id, []):
             self.rooms[room_id].remove(websocket)
-            # agar room empty ho jaye toh delete kar do
+         
             if not self.rooms[room_id]:
                 del self.rooms[room_id]
         return username, room_id
@@ -81,26 +81,28 @@ class NotificationManager:
                 print("[notify] send failed, removing conn:", e)
                 self.remove(conn)
 notification_manager = NotificationManager()
+
+
 @app.websocket("/ws/notify/{user_id}")
 async def websocket_notify(websocket: WebSocket, user_id: str):
-    # IMPORTANT: Make sure client connects to the exact path (no extra trailing slash)
+    
     await websocket.accept()
     await notification_manager.add(websocket, user_id)
-    # Send immediate ack so client can confirm connection established
+   
     try:
         await websocket.send_text(json.dumps({"type": "system", "message": "notify_connected"}))
     except Exception as e:
         print("[notify] failed to send initial ack:", e)
     try:
-        # Keep the connection alive without expecting client messages
+        
         while True:
-            # optional: periodic ping to detect dead connections earlier
+            
             await asyncio.sleep(30)
-            # Don't spam clients with pings — comment out if not needed
+            
             try:
                 await websocket.send_text(json.dumps({"type": "ping"}))
             except Exception:
-                # client disconnected or error => break loop and cleanup
+                
                 break
     except WebSocketDisconnect:
         print("[notify] websocket disconnect exception")
@@ -125,8 +127,7 @@ async def websocket_notify(websocket: WebSocket, user_id: str):
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
-        # client se first message ayega -> join payload
-        # example: {"type": "join", "username": "Alice", "chatroom_id": "123"}
+
         join_data = await websocket.receive_text()
         join_payload = json.loads(join_data)
         if join_payload.get("type") != "join":
@@ -136,7 +137,7 @@ async def websocket_endpoint(websocket: WebSocket):
         room_id = join_payload["chatroom_id"]
         # register user
         await manager.add(websocket, username, room_id)
-        # ab infinite loop messages ke liye
+        
         while True:
             data = await websocket.receive_text()
             payload = json.loads(data)
@@ -154,13 +155,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 }
                 if receiver:
                     save_data["receiver_id"]=receiver
-                # Django API me save karo
+               
                 response = requests.post(DJANGO_API_URL, json=save_data)
                 if response.status_code == 201:
                     print("🟢 Message saved in Django")
                 else:
                     print(":x: Django save error:", response.text)
-                # broadcast message to same room
+               
                 await manager.broadcast(chatroom, {
                     "type": "chat",
                     "username": username,

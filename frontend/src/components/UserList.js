@@ -9,8 +9,8 @@ export default function UserList() {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  //const username = localStorage.getItem("username")
-  const userid = localStorage.getItem("userid")
+  //const username = sessionStorage.getItem("username")
+  const userid = sessionStorage.getItem("userid")
   useEffect(() => {
     (async () => {
       try {
@@ -66,7 +66,7 @@ export default function UserList() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("access")}`
+          "Authorization": `Bearer ${sessionStorage.getItem("access")}`
         },
         body: JSON.stringify({
           user1: userid,

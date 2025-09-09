@@ -7,7 +7,7 @@ export default function Groups() {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const userid = localStorage.getItem("userid");
+  const userid = sessionStorage.getItem("userid");
 
   useEffect(() => {
     (async () => {
@@ -16,7 +16,7 @@ export default function Groups() {
           "http://127.0.0.1:8000/chatrooms/public/groups",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("access")}`,
+              Authorization: `Bearer ${sessionStorage.getItem("access")}`,
             },
           }
         );
@@ -39,7 +39,7 @@ export default function Groups() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("access")}`,
           },
           body: JSON.stringify({
             participant_id: [parseInt(userid)],
@@ -74,7 +74,7 @@ export default function Groups() {
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("access")}`,
           },
         }
       );
@@ -96,9 +96,10 @@ export default function Groups() {
 
   return (
     <div>
-      <h3>Public Groups</h3>
+     
       <Card className="mt-4 shadow-sm">
-        <Card.Header>Available Groups</Card.Header>
+         <h4 className="card-header ">Available Groups</h4>
+      
         <ListGroup variant="flush">
           {loading && (
             <ListGroup.Item className="text-secondary">

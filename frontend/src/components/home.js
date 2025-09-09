@@ -12,12 +12,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const username = localStorage.getItem("username")
-  const userid = localStorage.getItem("userid");
+  const username = sessionStorage.getItem("username")
+  const userid = sessionStorage.getItem("userid");
   const [viewMode, setViewMode] = useState("chats");
-const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     name: "",
-    avatar:"",
+    avatar: "",
   });
 
 
@@ -29,7 +29,7 @@ const [formData, setFormData] = useState({
           {
             method: "GET",
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("access")}`,
+              Authorization: `Bearer ${sessionStorage.getItem("access")}`,
             },
           }
         );
@@ -39,7 +39,7 @@ const [formData, setFormData] = useState({
         if (res.ok) {
           setFormData({
             name: data.name || "",
-            avatar:data.avatar || ""
+            avatar: data.avatar || ""
           });
         } else {
           setErr("Failed to load profile");
@@ -61,7 +61,7 @@ const [formData, setFormData] = useState({
           "http://127.0.0.1:8000/chatrooms/mychats",
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("access")}`,
+              Authorization: `Bearer ${sessionStorage.getItem("access")}`,
             },
           }
         );
@@ -70,7 +70,7 @@ const [formData, setFormData] = useState({
         const chatroom_id = data.data[0].chatroom_id;
         setUsers(
           Array.isArray(data.data)
-            ? data.data.map((u) => ({ ...u, new_message: false })) 
+            ? data.data.map((u) => ({ ...u, new_message: false }))
             : []
         );
       } catch (e) {
@@ -84,9 +84,9 @@ const [formData, setFormData] = useState({
   //2
 
   useEffect(() => {
-    const userId = localStorage.getItem("userid");
+    const userId = sessionStorage.getItem("userid");
     if (!userId) return;
-    const wsUrl = `ws://127.0.0.1:9000/ws/notify/${userId}`; 
+    const wsUrl = `ws://127.0.0.1:9000/ws/notify/${userId}`;
     console.log("connecting notify ws:", wsUrl);
     const ws = new WebSocket(wsUrl);
     ws.onopen = () => {
@@ -97,7 +97,7 @@ const [formData, setFormData] = useState({
         const data = JSON.parse(ev.data);
         console.log("Notify message:", data);
         if (data.type === "notify" || data.type === "notification") {
-        
+
           setUsers((prevUsers) =>
             prevUsers.map((u) =>
               u.chatroom_id === data.chatroom_id
@@ -155,7 +155,7 @@ const [formData, setFormData] = useState({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("access")}`,
           },
           body: JSON.stringify({
             user1: userid,
@@ -170,6 +170,7 @@ const [formData, setFormData] = useState({
         sessionStorage.setItem("chatRoom", JSON.stringify(data));
 
         window.location.href = `/chat.html`;
+     
       } else {
         alert(data.error || "Something went wrong");
       }
@@ -182,65 +183,62 @@ const [formData, setFormData] = useState({
   };
 
   const handleLogoutClick = () => {
-    localStorage.clear();
+    sessionStorage.clear();
     window.location.href = "/login";
   };
 
   return (
     <div className="container py-4 ">
-       {viewMode === "chats" ? (
-        <>
-      <div className="card shadow-lg ">
+
+      <div className="card bg-light ">
         <div className="card-header d-flex align-items-center justify-content-between">
           <h3>Welcome, {username}</h3>
 
-           <div>
-          <button
-            className={`btn me-2 ${
-              viewMode === "chats" ? "btn-primary" : "btn-outline-primary"
-            }`}
-            onClick={() => setViewMode("chats")}
-          >
-            Chats
-          </button>
-          <button
-            className={`btn ${
-              viewMode === "groups" ? "btn-primary" : "btn-outline-primary"
-            }`}
-            onClick={() => setViewMode("groups")}
-          >
-            Groups
-          </button>
-        </div>
+          <div>
+            <button
+              className={`btn me-2 ${viewMode === "chats" ? "btn-primary" : "btn-outline-primary"
+                }`}
+              onClick={() => setViewMode("chats")}
+            >
+              Chats
+            </button>
+            <button
+              className={`btn ${viewMode === "groups" ? "btn-primary" : "btn-outline-primary"
+                }`}
+              onClick={() => setViewMode("groups")}
+            >
+              Groups
+            </button>
+          </div>
 
           {/* Avatar + Dropdown */}
           <div className="position-relative">
-           {formData.avatar ? 
-            <img
-            src={`http://127.0.0.1:8000/auth/user${formData.avatar}`}
-              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-              style={{
-                width: "40px",
-                height: "40px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            >
-            </img>
-             :
+            {formData.avatar ?
+              <img
+                src={`http://127.0.0.1:8000/auth/user${formData.avatar}`}
+                className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+              </img>
+              :
               <div
-              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-              style={{
-                width: "40px",
-                height: "40px",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            >
-              {(username.split(/\s+/).slice(0, 2)).map((p) => p[0]?.toUpperCase() || "").join("")}
-            </div>}
+                className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                {(username.split(/\s+/).slice(0, 2)).map((p) => p[0]?.toUpperCase() || "").join("")}
+              </div>}
             {dropdownOpen && (
               <div
                 className="position-absolute bg-white border rounded shadow"
@@ -253,14 +251,14 @@ const [formData, setFormData] = useState({
                   className="dropdown-item "
                   onClick={handleLogoutClick}
                 >
-                  <Logout/>
+                  <Logout />
                 </button>
               </div>
             )}
           </div>
         </div>
-        <div className="card-header d-flex align-items-center justify-content-between">
-          <h3>Chats</h3>
+        {/* <div className="card-header d-flex align-items-center justify-content-between">
+         
 
           <div className="d-flex" style={{ gap: 8 }}>
             <input
@@ -271,69 +269,72 @@ const [formData, setFormData] = useState({
               style={{ width: 240 }}
             />
           </div>
-        </div>
+        </div> */}
+      </div>
+      {viewMode === "chats" ? (<>
+        <div className="card shadow-sm mt-4">
+          <h4 className="card-header ">Chats</h4>
+          <div className=" card  list-group list-group-flush">
+            {loading && (
+              <div className="list-group-item text-secondary">Loading…</div>
+            )}
+            {err && !loading && (
+              <div className="list-group-item text-danger">{err}</div>
+            )}
+            {!loading && !err && filtered.length === 0 && (
+              <div className="list-group-item text-secondary">No users found</div>
+            )}
 
-        <div className="list-group list-group-flush">
-          {loading && (
-            <div className="list-group-item text-secondary">Loading…</div>
-          )}
-          {err && !loading && (
-            <div className="list-group-item text-danger">{err}</div>
-          )}
-          {!loading && !err && filtered.length === 0 && (
-            <div className="list-group-item text-secondary">No users found</div>
-          )}
-
-          {!loading &&
-            !err &&
-            filtered.map((u) => (
-              <div
-                key={u.id}
-                className="list-group-item d-flex align-items-center justify-content-between"
-              >
-                <div className="d-flex align-items-center" style={{ gap: 12 }}>
-                  {/* Simple circle avatar with initials (no extra lib) */}
-                  <div
-                    style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background: "#e9ecef",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {initials(u)}
-                  </div>
-                  <div>
-                    <div className="fw-semibold">{displayName(u)}</div>
-                    <div className="text-muted small">{u.email || "-"}</div>
-                    {/* <div className="text-danger">{not}</div> */}
-                    <div className="text-danger">
-                      {u.new_message ? "New Message" : "no new msg"}
+            {!loading &&
+              !err &&
+              filtered.map((u) => (
+                <div
+                  key={u.id}
+                  className="list-group-item d-flex align-items-center justify-content-between"
+                >
+                  <div className="d-flex align-items-center" style={{ gap: 12 }}>
+                    {/* Simple circle avatar with initials (no extra lib) */}
+                    <div
+                      style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "#e9ecef",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {initials(u)}
+                    </div>
+                    <div>
+                      <div className="fw-semibold">{displayName(u)}</div>
+                      <div className="text-muted small">{u.email || "-"}</div>
+                      {/* <div className="text-danger">{not}</div> */}
+                      <div className="text-danger">
+                        {u.new_message ? "New Message" : "no new msg"}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => goToChat(u)}
-                  title={`Chat with ${displayName(u)}`}
-                >
-                  Chat
-                </button>
-              </div>
-            ))}
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => goToChat(u)}
+                    title={`Chat with ${displayName(u)}`}
+                  >
+                    Chat
+                  </button>
+                </div>
+              ))}
+          </div>
+
         </div>
-      </div>
-      <MyModal msg="+" />
-     </>
-     ): (
-        <Groups />  
+        <MyModal msg="+" /></>
+      ) : (
+        <Groups />
       )}
-     
+
     </div>
   );
 }

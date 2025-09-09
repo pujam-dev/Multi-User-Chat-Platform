@@ -76,14 +76,14 @@ class LeaveGroupView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
-        user = request.user  # Logged in user
+        user = request.user 
         try:
             group = ChatRoom.objects.get(id=pk, room_type="public")
         except ChatRoom.DoesNotExist:
             return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
 
         if user in group.participant_id.all():
-            group.participant_id.remove(user)  # Remove user from participants
+            group.participant_id.remove(user) 
             group.save()
             return Response({"msg": "Left group successfully"}, status=status.HTTP_200_OK)
         else:

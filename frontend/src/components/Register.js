@@ -45,7 +45,8 @@ const Register = () => {
     }
   };
   return (
-    <div className="container mt-4 w-25 border rounded">
+    <div className="container  d-flex justify-content-center align-items-center vh-100">
+      <div className="p-4 bg-light border rounded shadow-lg" >
       <h2 className="mb-3">Register</h2>
       {message && <div className="alert alert-info">{message}</div>}
       <form onSubmit={handleSubmit}>
@@ -114,6 +115,7 @@ const Register = () => {
         </button>
         <p>Already have an account !! <Link to="/login">Login</Link> </p>
       </form>
+      </div>
     </div>
   );
 };
