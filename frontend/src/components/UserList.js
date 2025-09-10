@@ -14,10 +14,12 @@ export default function UserList() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await getUsers(); // must return array of users
+        const data = await getUsers(); 
         setUsers(Array.isArray(data) ? data : []);
+        
       } catch (e) {
-        setErr("Unable to load users");
+        
+        setErr("Unable to load users",e);
       } finally {
         setLoading(false);
       }
@@ -51,14 +53,6 @@ export default function UserList() {
   };
 
   const goToChat = async (u) => {
-    // Navigate to your dedicated chat page
-    // You can choose either a route param or query params; both examples below.
-
-    // Option A: /chat/:id
-    // navigate(`/chat/${u.id}`, { state: { name: displayName(u) } });
-    // Option B (alternative): /chat?to=<id>&name=<name>
-    // navigate(`/chat?to=${u.id}&name=${encodeURIComponent(displayName(u))}`);
-
 
     try {
 
@@ -73,10 +67,10 @@ export default function UserList() {
           user2: u.id
         }),
       });
-      console.log(userid, u.id)
+      //console.log(userid, u.id)
       const data = await res.json();
       if (res.ok) {
-        console.log("Private room:", data);
+      //  console.log("Private room:", data);
         sessionStorage.setItem("chatRoom", JSON.stringify(data));
 
         window.location.href = `/chat.html`;
@@ -88,7 +82,7 @@ export default function UserList() {
     }
 
 
-    // window.location.href = `/chat.html?username=${displayName(u)}`
+
   };
 
 
@@ -128,7 +122,6 @@ export default function UserList() {
                 className="list-group-item d-flex align-items-center justify-content-between"
               >
                 <div className="d-flex align-items-center" style={{ gap: 12 }}>
-                  {/* Simple circle avatar with initials (no extra lib) */}
                   <div
                     style={{
                       width: 38,

@@ -53,7 +53,6 @@ export default function Profile() {
   }, []);
 
   const handleChange = (e) => {
-    // setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     const {name,value,files}=e.target
     if ( name === "avatar"){
       setFormData((prev)=>({...prev, avatar:files[0]}))

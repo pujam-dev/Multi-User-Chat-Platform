@@ -47,10 +47,10 @@ const CreateGroup = ({onClose}) => {
                 <Form.Group className="mb-3" >
                     <Form.Label>Group Type</Form.Label>
 
-                    <Form.Check // prettier-ignore
-                        type="radio" label="Private " name='room_type' value='private' checked={room_type === 'private'} onChange={(e) => setRoomType(e.target.value)}
+                    <Form.Check 
+                        type="radio" label="Private " name='room_type' value='private_group' checked={room_type === 'private_group'} onChange={(e) => setRoomType(e.target.value)}
                     />
-                    <Form.Check // prettier-ignore
+                    <Form.Check 
                         type="radio" label="Public " name='room_type' value='public' checked={room_type === 'public'} onChange={(e) => setRoomType(e.target.value)}
                     />
                 </Form.Group>

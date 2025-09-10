@@ -8,7 +8,7 @@ from users.models import User
 from users.renderers import UserRenderer
 from chatrooms.serializers import ChatRoomSerializer
 from users.serializers import UserSerializer
-
+from django.db.models import Q
 
 
 
@@ -32,7 +32,7 @@ class PrivateChatView(APIView):
             room.participant_id.set([user1, user2])
         serializer = ChatRoomSerializer(room)
         return Response({"data":serializer.data,"sender":user1.id,"receiver":user2.id}, status=status.HTTP_200_OK)
-
+# this is for both private and public group create
 class PublicChatList(generics.ListCreateAPIView):
     renderer_classes = [UserRenderer]
     queryset = ChatRoom.objects.filter(room_type="public")
@@ -40,6 +40,26 @@ class PublicChatList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     def get_serializer_context(self):
         return {"request": self.request}
+
+    
+
+class AllChatGroupsList(generics.ListCreateAPIView):
+    renderer_classes = [UserRenderer]
+    serializer_class = ChatRoomSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = ChatRoom.objects.filter(
+            Q(room_type="public") | Q(room_type="private_group", participant_id=user)
+        ).distinct()
+        #print(queryset)
+        return queryset
+    
+    def get_serializer_context(self):
+        return {"request": self.request}
+    
+
 class PublicChatUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
     renderer_classes = [UserRenderer]
     queryset = ChatRoom.objects.filter(room_type="public")
