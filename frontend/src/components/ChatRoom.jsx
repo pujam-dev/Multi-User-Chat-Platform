@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ChatInput from "./ChatInput";
+import EmojiPicker from "emoji-picker-react";
 export default function ChatRoom() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
-  const [onlineCount, setOnlineCount] = useState(0);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [socket, setSocket] = useState(null);
   const navigate = useNavigate();
   const chatRoomDetails = JSON.parse(sessionStorage.getItem("chatRoom"));
@@ -52,7 +52,7 @@ export default function ChatRoom() {
         if (incoming.type === "system") {
           appendMessage(incoming.message, "system");
         } else if (incoming.type === "chat") {
-          const kind = incoming.sender_id == sessionStorage.getItem('userid') ? "me" : "other";
+          const kind = incoming.sender_id == sessionStorage.getItem("userid") ? "me" : "other";
           appendMessage(`<strong>${incoming.username}:</strong> ${incoming.message}`, kind);
         }
       } catch {
@@ -75,27 +75,29 @@ export default function ChatRoom() {
     const payload =
       room_type === "private"
         ? {
-          type: "chat",
-          receiver_id: receiver,
-          sender_id: sender,
-          chatroom_id: chatroomId,
-          content: text,
-        }
+            type: "chat",
+            receiver_id: receiver,
+            sender_id: sender,
+            chatroom_id: chatroomId,
+            content: text,
+          }
         : {
-          type: "chat",
-          sender_id: sessionStorage.getItem("userid"),
-          chatroom_id: id,
-          content: text,
-        };
+            type: "chat",
+            sender_id: sessionStorage.getItem("userid"),
+            chatroom_id: id,
+            content: text,
+          };
     socket.send(JSON.stringify(payload));
     setText("");
+  };
+  const handleEmojiClick = (emojiData, event) => {
+    setText((prev) => prev + emojiData.emoji);
   };
   if (!chatRoomDetails) return null;
   const chatRoomData = chatRoomDetails.data || chatRoomDetails;
   const { name } = chatRoomData;
   return (
     <div style={{ fontFamily: "Arial, sans-serif", maxWidth: "600px", margin: "20px auto", border: "1px solid #ddd", borderRadius: "8px", boxShadow: "0 0 10px rgba(0,0,0,0.1)" }}>
-      {/* Back Button */}
       <div style={{ padding: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
         <button
           style={{ background: "#007bff", color: "white", border: "none", borderRadius: "4px", padding: "6px 12px", cursor: "pointer" }}
@@ -104,10 +106,8 @@ export default function ChatRoom() {
           ← Back
         </button>
         <h4 style={{ margin: 0 }}>Chatting with: {name || "Unknown User"}</h4>
-      
       </div>
-      
-      <div id="messages" style={{ height: "400px", overflowY: "auto", padding: "15px", backgroundColor: "#f9f9f9" }}>
+      <div id="messages" style={{ height: "400px", overflowY: "auto", padding: "5px", backgroundColor: "#f9f9f9" }}>
         {messages.map((msg, idx) => (
           <div key={idx} className={`msg ${msg.kind}`} style={{
             background: msg.kind === "me" ? "#dcf8c6" : msg.kind === "system" ? "#eee" : "#f1f0f0",
@@ -115,25 +115,34 @@ export default function ChatRoom() {
             margin: "8px 0",
             padding: "10px",
             borderRadius: "8px",
-            maxWidth: "80%",
+            maxWidth: "95%",
           }} dangerouslySetInnerHTML={{ __html: msg.content }}></div>
         ))}
       </div>
-      <div style={{ display: "flex", padding: "10px", borderTop: "1px solid #ddd" }}>
+      <div style={{ position: "relative", display: "flex", padding: "10px", borderTop: "1px solid #ddd", alignItems: "center" }}>
+        <button
+          type="button"
+          className="btn btn-light me-2"
+          onClick={() => setShowEmojiPicker((prev) => !prev)}
+        >
+          😀
+        </button>
+        {showEmojiPicker && (
+          <div style={{ position: "absolute", bottom: "60px", zIndex: 1000 }}>
+            <EmojiPicker onEmojiClick={handleEmojiClick} />
+          </div>
+        )}
         <input
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Type a message..."
-          style={{ flex: 1, padding: "10px", borderRadius: "5px", border: "1px solid #ddd" }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleSend();
-          }}
+          className="form-control"
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
         />
-        <ChatInput/>
         <button
           onClick={handleSend}
-          style={{ width: "120px", marginLeft: "10px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px" }}
+          className="btn btn-success ms-2"
         >
           Send
         </button>
@@ -141,3 +150,6 @@ export default function ChatRoom() {
     </div>
   );
 }
+
+
+
