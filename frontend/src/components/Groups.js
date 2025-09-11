@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card, ListGroup, Spinner } from "react-bootstrap";
 import { fetchWithAuth } from "../api";
+import { useNavigate } from "react-router-dom";
 import MyModal from "../MyModal";
 
 export default function Groups() {
@@ -8,6 +9,7 @@ export default function Groups() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
   const userid = sessionStorage.getItem("userid");
+   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -138,7 +140,8 @@ export default function Groups() {
                           "chatRoom",
                           JSON.stringify(g)
                         );
-                        window.location.href = `/chat.html`;
+                      //  window.location.href = `/chat.html`;
+                         navigate("/chat");
                       } else {
                         joinGroup(g.id, g.name, g.room_type);
                       }

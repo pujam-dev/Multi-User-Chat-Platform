@@ -6,6 +6,7 @@ import Profile from "./components/Profile";
 import { createBrowserRouter, RouterProvider ,redirect} from 'react-router-dom';
 import Register from "./components/Register";
 import Home from "./components/home";
+import ChatRoom from "./components/ChatRoom";
 function App() {
 
   function requireAuth(){
@@ -39,6 +40,11 @@ function App() {
       {
       path: "/home",
       element: <Home />,
+      loader:()=> requireAuth(),
+    },
+     {
+      path: "/chat",
+      element: <ChatRoom />,
       loader:()=> requireAuth(),
     },
     

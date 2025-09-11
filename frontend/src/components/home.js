@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 import MyModal from "../MyModal";
 import Groups from "./Groups";
 import { fetchWithAuth } from "../api";
@@ -170,7 +170,9 @@ export default function Home() {
         console.log("Private room:", data);
         sessionStorage.setItem("chatRoom", JSON.stringify(data));
 
-        window.location.href = `/chat.html`;
+       // window.location.href = `/chat.html`;
+      //  <Link to='/chat'></Link>
+        navigate("/chat");
      
       } else {
         alert(data.error || "Something went wrong");
