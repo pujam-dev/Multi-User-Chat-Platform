@@ -57,12 +57,12 @@ export const register = async (userData) => {
     body: JSON.stringify(userData)
   })
   const json = await data.json()
-  //console.log(json)
+ // console.log(json)
   if (data.ok) {
     sessionStorage.setItem("access", json.token.access);
     sessionStorage.setItem("refresh", json.token.refresh);
-    sessionStorage.setItem("userid", json.data.userid);
-    sessionStorage.setItem("username", json.data.username);
+    sessionStorage.setItem("userid", json.data.id);
+    sessionStorage.setItem("username", json.data.name);
   }
   return json
 }

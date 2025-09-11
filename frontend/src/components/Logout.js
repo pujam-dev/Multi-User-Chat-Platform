@@ -39,9 +39,9 @@ const handleSubmit = async (e) => {
 
   return (
     <>
-      <button  onClick={handleSubmit}>
+      <p  onClick={handleSubmit}>
         Logout
-      </button>
+      </p>
     </>
   );
 };

@@ -28,9 +28,9 @@ const Register = () => {
 
     try {
       const res = await register(form);
-     
+      console.log("res ",res)
       if (res && !res.errors) {
-           setMessage(" Registration successful!");
+        setMessage(" Registration successful!");
        
         setTimeout(() => {
           navigate("/home");

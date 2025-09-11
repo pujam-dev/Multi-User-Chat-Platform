@@ -74,7 +74,7 @@ export default function Home() {
             : []
         );
       } catch (e) {
-        setErr("Unable to load users");
+        setErr("No chats yet");
       } finally {
         setLoading(false);
       }
@@ -244,11 +244,11 @@ export default function Home() {
                 className="position-absolute bg-white border rounded shadow"
                 style={{ top: "50px", right: 0, minWidth: "150px", zIndex: 10 }}
               >
-                <button className="dropdown-item m-2 " onClick={handleProfileClick}>
+                <button className="dropdown-item m-2 border" onClick={handleProfileClick}>
                   Profile
                 </button>
                 <button
-                  className="dropdown-item "
+                  className="dropdown-item m-2 border"
                   onClick={handleLogoutClick}
                 >
                   <Logout />
