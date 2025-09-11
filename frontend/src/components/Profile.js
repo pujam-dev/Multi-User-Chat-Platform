@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchWithAuth } from "../api";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const [profile, setProfile] = useState({});
@@ -15,7 +16,7 @@ export default function Profile() {
     status: "",
     avatar:"",
   });
-
+ const navigate=useNavigate()
   useEffect(() => {
     (async () => {
       try {
@@ -102,8 +103,16 @@ export default function Profile() {
 
   return (
     <div className="container py-5" style={{ maxWidth: "600px", backgroundColor: "#f8f9fa", borderRadius: "10px", boxShadow: "0 0 10px rgba(0,0,0,0.1)" }}>
-      <h3 className="text-center mb-4">User Profile</h3>
-
+     
+         <div className="d-flex" style={{ padding: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+        <button
+          style={{ background: "#007bff", color: "white", border: "none", borderRadius: "4px", padding: "6px 12px", cursor: "pointer" }}
+          onClick={() => navigate(-1)}
+        >
+          ← Back
+        </button>
+       <h3 className="text-center ">User Profile</h3>
+      </div>
       {err && <div className="alert alert-danger">{err}</div>}
       {successMsg && <div className="alert alert-success">{successMsg}</div>}
 

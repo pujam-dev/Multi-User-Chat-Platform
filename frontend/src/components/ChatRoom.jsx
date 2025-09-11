@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ChatInput from "./ChatInput";
 export default function ChatRoom() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -51,7 +52,7 @@ export default function ChatRoom() {
         if (incoming.type === "system") {
           appendMessage(incoming.message, "system");
         } else if (incoming.type === "chat") {
-          const kind = incoming.sender_id === sender ? "me" : "other";
+          const kind = incoming.sender_id == sessionStorage.getItem('userid') ? "me" : "other";
           appendMessage(`<strong>${incoming.username}:</strong> ${incoming.message}`, kind);
         }
       } catch {
@@ -129,6 +130,7 @@ export default function ChatRoom() {
             if (e.key === "Enter") handleSend();
           }}
         />
+        <ChatInput/>
         <button
           onClick={handleSend}
           style={{ width: "120px", marginLeft: "10px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px" }}
