@@ -5,6 +5,7 @@ import MyModal from "../MyModal";
 import Groups from "./Groups";
 import { fetchWithAuth } from "../api";
 import Logout from "./Logout";
+
 export default function Home() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);

@@ -117,7 +117,8 @@ export default function UserList() {
           {!loading &&
             !err &&
             filtered.map((u) => (
-              <div
+              !(u.id == userid ) ?
+            <>  <div
                 key={u.id}
                 className="list-group-item d-flex align-items-center justify-content-between"
               >
@@ -149,7 +150,7 @@ export default function UserList() {
                 >
                   Chat
                 </button>
-              </div>
+              </div> </>: <></>
             ))}
         </div>
       </div>
